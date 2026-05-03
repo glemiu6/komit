@@ -1,4 +1,4 @@
-## 0.2.0
+## 0.2.1
 
 - Added version check on startup - notifies when a new version is available
 - Added `komit-update` command to update from the CLI
