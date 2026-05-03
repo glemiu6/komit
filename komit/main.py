@@ -63,7 +63,7 @@ def run():
     except RuntimeError as e:
         print(f"Error: {e}")
         sys.exit(1)
-    print(f"\nSuggested message: {message}")
+    print(f"\nSuggested message:\n {message}")
     while True:
         choice= input("\nUse this message? (y/n/e to edit/r to regenerate): ").strip().lower()
         match choice :
