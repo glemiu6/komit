@@ -1,3 +1,9 @@
 .python-version
 .venv
 .idea
+uv.lock
+__pycache__/
+*.pyc
+dist/
+build/
+*.egg-info/
