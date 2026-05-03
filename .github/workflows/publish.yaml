@@ -8,7 +8,6 @@ on:
 
 jobs:
   build:
-    # Fix: grant permission to create and upload to GitHub Releases
     permissions:
       contents: write
 
@@ -17,12 +16,10 @@ jobs:
         include:
           - os: ubuntu-latest
             name: komit-linux-x86_64
-          - os: macos-13
-            name: komit-macos-x86_64
           - os: macos-latest
             name: komit-macos-arm64
           - os: windows-latest
-            name: komit-windows-x86_64.exe
+            name: komit-windows-x86_64
 
     runs-on: ${{ matrix.os }}
 
@@ -40,10 +37,19 @@ jobs:
       - name: Build binary
         run: pyinstaller --onefile komit/main.py --name ${{ matrix.name }}
 
-      - name: Upload binary to release
+      - name: Upload binary to release (Unix)
+        if: runner.os != 'Windows'
         uses: softprops/action-gh-release@v2
         with:
           files: dist/${{ matrix.name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload binary to release (Windows)
+        if: runner.os == 'Windows'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/${{ matrix.name }}.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

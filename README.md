@@ -47,12 +47,12 @@ pip install komit
 
 Download the binary for your platform from [GitHub Releases](https://github.com/glemiu6/komit/releases/latest):
 
-| Platform | Binary |
-|----------|--------|
-| Linux x86_64 | `komit-linux-x86_64` |
-| macOS Apple Silicon | `komit-macos-arm64` |
-| macOS Intel | `komit-macos-x86_64` |
-| Windows | `komit-windows-x86_64.exe` |
+| Platform            | Binary                      |
+|---------------------|-----------------------------|
+| Linux x86_64        | `komit-linux-x86_64`        |
+| macOS Apple Silicon | `komit-macos-arm64`         |
+| Windows             | `komit-windows-x86_64.exe`  |
+> Intel Mac users: use `pip install komit` instead.
 
 ```bash
 # Linux/Mac

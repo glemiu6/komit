@@ -17,7 +17,6 @@ case $OS in
       ;;
     Darwin)
       case $ARCH in
-        x86_64)   NAME="komit-macos-x86_64" ;;
         arm64)    NAME="komit-macos-arm64" ;;
         *)        echo "Unsupported architecture: $ARCH"; exit 1 ;;
       esac
