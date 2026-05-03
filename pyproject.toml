@@ -17,7 +17,7 @@ dependencies = [
 komit = "komit.main:run"
 git-ai = "komit.main:run"
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = [
     "pytest>=8.0.0",
     "build>=1.4.4",
