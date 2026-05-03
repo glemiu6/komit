@@ -6,6 +6,25 @@ import argparse
 from komit.git_utils import get_staged_files,get_staged_diff,is_git_repo,commit,commit_with_editor
 from komit.generator import generate_message,STYLES
 from komit.komitconfig import KomitConfig
+def check_for_updates():
+    try:
+        import httpx
+        from komit import __version__
+        response= httpx.get(
+            "https://api.github.com/repos/glemiu6/komit/releases/latest",
+            timeout=2
+        )
+        latest= response.json()["tag_name"].lstrip("v")
+        if latest != __version__:
+            print(f"!!  New version available: v{latest} (you have v{__version__})")
+            print(f"    Run: komit-update\n")
+    except Exception:
+        pass
+def update()->None:
+    print("Updating komit...")
+    result = subprocess.run(["curl","-fsSL","https://raw.githubusercontent.com/glemiu6/komit/master/scripts/install.sh"],capture_output=True,text=True)
+    subprocess.run(['bash'],input=result.stdout)
+    print("Done!")
 def parse_args():
     parser = argparse.ArgumentParser(
         prog="komit",
@@ -38,6 +57,7 @@ def parse_args():
     )
     return parser.parse_args()
 def run():
+    check_for_updates()
     args = parse_args()
     if not is_git_repo():
         print("Not a git repository")

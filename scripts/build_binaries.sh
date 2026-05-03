@@ -3,7 +3,7 @@
 set -e
 
 OS=$(uname -s)
-ARCH=$(uname -s)
+ARCH=$(uname -m)
 echo "Building binaries for $OS/$ARCH..."
 pip install pyinstaller
 

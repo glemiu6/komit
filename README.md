@@ -23,6 +23,18 @@ AI-powered git commit message generator using local LLMs via Ollama. No API keys
 
 ---
 
+## Update
+
+```bash
+komit-update
+```
+
+Or reinstall via your original method.
+
+> komit automatically checks for updates on startup and notifies you when a new version is available.
+
+---
+
 ## Requirements
 
 - [Ollama](https://ollama.com) installed and running
@@ -30,6 +42,21 @@ AI-powered git commit message generator using local LLMs via Ollama. No API keys
 
 ---
 
+
+
+## Recommended Models
+
+| Model | Size | Best for |
+|-------|------|----------|
+| `qwen2.5:7b` | 4.7GB | Best quality |
+| `llama3.2:3b` | 2.0GB | Fastest |
+| `mistral:7b` | 4.1GB | Good balance |
+
+```bash
+ollama pull qwen2.5:7b
+```
+
+---
 ## Installation
 
 ### Option 1 — One line install (no Python required)
@@ -183,19 +210,7 @@ feat: add user authentication
 - Add refresh token support
 ```
 
----
 
-## Recommended Models
-
-| Model | Size | Best for |
-|-------|------|----------|
-| `qwen2.5:7b` | 4.7GB | Best quality |
-| `llama3.2:3b` | 2.0GB | Fastest |
-| `mistral:7b` | 4.1GB | Good balance |
-
-```bash
-ollama pull qwen2.5:7b
-```
 
 ---
 
