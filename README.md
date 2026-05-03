@@ -4,10 +4,10 @@ AI-powered git commit message generator using local LLMs via Ollama. No API keys
 
 ---
 
-![PyPI](https://img.shields.io/pypi/v/komit)
-![Python](https://img.shields.io/badge/python-3.13+-blue)
-![License](https://img.shields.io/github/license/glemiu6/komit)
-![Downloads](https://img.shields.io/pypi/dm/komit)
+[![PyPI](https://img.shields.io/pypi/v/komit)](https://pypi.org/project/komit)
+[![Python](https://img.shields.io/badge/python-3.13+-blue)](https://www.python.org)
+[![License](https://img.shields.io/github/license/glemiu6/komit)](https://github.com/glemiu6/komit/blob/master/LICENSE)
+[![Downloads](https://img.shields.io/pypi/dm/komit)](https://pypi.org/project/komit)
 
 ---
 
@@ -17,6 +17,7 @@ AI-powered git commit message generator using local LLMs via Ollama. No API keys
 - 📝 **Multiple commit styles** — conventional, simple, detailed
 - 🔄 **Regenerate** — not happy? generate a new message instantly
 - ✏️ **Edit before commit** — open your editor to tweak the message
+- ⚙️ **CLI flags** — control style, model, and more from the command line
 - 🌍 **Universal** — works via pip, binary, or shell script
 - ⚡ **Fast** — runs on your machine, no network calls to external APIs
 
@@ -43,7 +44,13 @@ curl -fsSL https://raw.githubusercontent.com/glemiu6/komit/master/scripts/instal
 pip install komit
 ```
 
-### Option 3 — Download binary
+### Option 3 — pipx (recommended for CLI tools)
+
+```bash
+pipx install komit
+```
+
+### Option 4 — Download binary
 
 Download the binary for your platform from [GitHub Releases](https://github.com/glemiu6/komit/releases/latest):
 
@@ -52,6 +59,7 @@ Download the binary for your platform from [GitHub Releases](https://github.com/
 | Linux x86_64        | `komit-linux-x86_64`        |
 | macOS Apple Silicon | `komit-macos-arm64`         |
 | Windows             | `komit-windows-x86_64.exe`  |
+
 > Intel Mac users: use `pip install komit` instead.
 
 ```bash
@@ -77,17 +85,49 @@ Now you can use `git ai` as a shortcut.
 ## Usage
 
 ```bash
-# stage your changes
+# Stage your changes
 git add .
 
-# generate commit message
+# Generate commit message
 komit
 
-# or via git alias
+# Or via git alias
 git ai
 
-# or via shell script
+# Or via shell script
 ./scripts/commit.sh
+```
+
+### CLI flags
+
+```bash
+komit [--style STYLE] [--model MODEL] [--ollama-url URL] [--max-diff N]
+```
+
+| Flag | Options | Default | Description |
+|------|---------|---------|-------------|
+| `-s, --style` | `conventional`, `simple`, `detailed` | `conventional` | Commit message style |
+| `-m, --model` | any Ollama model | `qwen2.5:7b` | Model to use |
+| `-u, --ollama-url` | any URL | `http://localhost:11434` | Ollama server URL |
+| `--max-diff` | integer | `4000` | Max diff length sent to model |
+
+### Examples
+
+```bash
+# Use simple style
+komit --style simple
+
+# Use a faster model
+komit --model llama3.2:3b
+
+# Use detailed style with a different model
+komit --style detailed --model mistral:7b
+
+# Connect to a remote Ollama instance
+komit --ollama-url http://192.168.1.10:11434
+
+# Limit diff size for large changesets
+komit --max-diff 2000
 ```
 
 ### Interactive prompt
@@ -98,61 +138,49 @@ Staged files (3):
   - tests/test_auth.py
   - README.md
 
-Generating commit message...
+Generating commit message... (style: conventional, model: qwen2.5:7b)
 
 Suggested message:
   feat: add JWT authentication with refresh token support
 
-Use this message? (y/n/e to edit/r to regenerate): 
+Use this message? (y/n/e to edit/r to regenerate):
 ```
 
-- `y` — commit with the suggested message
-- `n` — cancel
-- `e` — open editor to modify the message
-- `r` — regenerate a new message
+| Key | Action |
+|-----|--------|
+| `y` | Commit with the suggested message |
+| `n` | Cancel |
+| `e` | Open editor to modify the message |
+| `r` | Regenerate a new message |
 
 ---
 
 ## Commit Styles
 
-Configure in `komitconfig.py` or pass as argument:
+### Conventional (default)
 
-**Conventional** (default):
 ```
 feat: add user authentication
 fix: resolve null pointer in login flow
 docs: update API reference
 ```
 
-**Simple:**
+### Simple
+
 ```
 Add user authentication
 Fix null pointer in login flow
 Update API reference
 ```
 
-**Detailed:**
+### Detailed
+
 ```
 feat: add user authentication
 
 - Add JWT token generation
 - Add password hashing with bcrypt
 - Add refresh token support
-```
-
----
-
-## Configuration
-
-Edit `komit/komitconfig.py`:
-
-```python
-@dataclass
-class KomitConfig:
-    model: str = "qwen2.5:7b"       # any Ollama model
-    style: str = "conventional"      # conventional, simple, detailed
-    max_diff_length: int = 4000      # truncate large diffs
-    ollama_url: str = "http://localhost:11434"
 ```
 
 ---
@@ -177,6 +205,8 @@ ollama pull qwen2.5:7b
 ./scripts/uninstall.sh
 # or
 pip uninstall komit
+# or
+pipx uninstall komit
 ```
 
 ---
@@ -193,4 +223,4 @@ pip uninstall komit
 
 ## License
 
-[Apache License](LICENSE)
+[Apache License 2.0](https://github.com/glemiu6/komit/blob/master/LICENSE)
