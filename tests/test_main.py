@@ -1,7 +1,6 @@
 import subprocess
 import pytest
-from unittest.mock import patch, MagicMock, call
-from io import StringIO
+from unittest.mock import patch
 from komit.main import run
 
 
@@ -262,3 +261,70 @@ class TestRunChoiceInvalid:
         """Input is lowercased, so 'Y' should work the same as 'y'."""
         run()
         mock_commit.assert_called_once()
+
+
+class TestRunCLIArgs:
+    @patch("komit.main.is_git_repo", return_value=True)
+    @patch("komit.main.get_staged_diff", return_value="diff")
+    @patch("komit.main.get_staged_files", return_value=["file.py"])
+    @patch("komit.main.commit")
+    @patch("builtins.input", return_value="n")
+    def test_default_style_is_conventional(self, _in, _commit, _files, _diff, _repo):
+        with patch("komit.main.generate_message", return_value="feat: thing") as mock_gen:
+            import sys
+            with patch.object(sys, "argv", ["komit"]):
+                run()
+            call_config = mock_gen.call_args.kwargs["config"]
+            assert call_config.style == "conventional"
+
+    @patch("komit.main.is_git_repo", return_value=True)
+    @patch("komit.main.get_staged_diff", return_value="diff")
+    @patch("komit.main.get_staged_files", return_value=["file.py"])
+    @patch("komit.main.commit")
+    @patch("builtins.input", return_value="n")
+    def test_style_flag_simple(self, _in, _commit, _files, _diff, _repo):
+        with patch("komit.main.generate_message", return_value="Add thing") as mock_gen:
+            import sys
+            with patch.object(sys, "argv", ["komit", "--style", "simple"]):
+                run()
+            call_config = mock_gen.call_args.kwargs["config"]
+            assert call_config.style == "simple"
+
+    @patch("komit.main.is_git_repo", return_value=True)
+    @patch("komit.main.get_staged_diff", return_value="diff")
+    @patch("komit.main.get_staged_files", return_value=["file.py"])
+    @patch("komit.main.commit")
+    @patch("builtins.input", return_value="n")
+    def test_style_flag_detailed(self, _in, _commit, _files, _diff, _repo):
+        with patch("komit.main.generate_message", return_value="feat: thing") as mock_gen:
+            import sys
+            with patch.object(sys, "argv", ["komit", "--style", "detailed"]):
+                run()
+            call_config = mock_gen.call_args.kwargs["config"]
+            assert call_config.style == "detailed"
+
+    @patch("komit.main.is_git_repo", return_value=True)
+    @patch("komit.main.get_staged_diff", return_value="diff")
+    @patch("komit.main.get_staged_files", return_value=["file.py"])
+    @patch("komit.main.commit")
+    @patch("builtins.input", return_value="n")
+    def test_model_flag(self, _in, _commit, _files, _diff, _repo):
+        with patch("komit.main.generate_message", return_value="feat: thing") as mock_gen:
+            import sys
+            with patch.object(sys, "argv", ["komit", "--model", "llama3.2:3b"]):
+                run()
+            call_config = mock_gen.call_args.kwargs["config"]
+            assert call_config.model == "llama3.2:3b"
+
+    @patch("komit.main.is_git_repo", return_value=True)
+    @patch("komit.main.get_staged_diff", return_value="diff")
+    @patch("komit.main.get_staged_files", return_value=["file.py"])
+    @patch("komit.main.commit")
+    @patch("builtins.input", return_value="n")
+    def test_ollama_url_flag(self, _in, _commit, _files, _diff, _repo):
+        with patch("komit.main.generate_message", return_value="feat: thing") as mock_gen:
+            import sys
+            with patch.object(sys, "argv", ["komit", "--ollama-url", "http://remotehost:11434"]):
+                run()
+            call_config = mock_gen.call_args.kwargs["config"]
+            assert call_config.ollama_url == "http://remotehost:11434"

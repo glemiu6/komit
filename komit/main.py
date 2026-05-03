@@ -2,11 +2,43 @@
 #komit/main.py
 import subprocess
 import sys
+import argparse
 from komit.git_utils import get_staged_files,get_staged_diff,is_git_repo,commit,commit_with_editor
-from komit.generator import generate_message
+from komit.generator import generate_message,STYLES
 from komit.komitconfig import KomitConfig
-
+def parse_args():
+    parser = argparse.ArgumentParser(
+        prog="komit",
+        description="AI-powered git commit message generator using local LLMs via Ollama."
+    )
+    parser.add_argument(
+        '-s',
+        '--style',
+        choices=list(STYLES.keys()),
+        default='conventional',
+        help="Choose the style of the commit message (default: conventional)."
+    )
+    parser.add_argument(
+        '-m',
+        '--model',
+        default='qwen2.5:7b',
+        help="Choose the model (default: qwen2.5:7b)."
+    )
+    parser.add_argument(
+        '--ollama-url',
+        '-u',
+        default='http://localhost:11434',
+        help="Choose the URL of the Ollama (default: http://localhost:11434)."
+    )
+    parser.add_argument(
+        '--max_diff',
+        default=4000,
+        type=int,
+        help="Choose the maximum diff length (default: 4000)."
+    )
+    return parser.parse_args()
 def run():
+    args = parse_args()
     if not is_git_repo():
         print("Not a git repository")
         sys.exit(1)
@@ -19,9 +51,14 @@ def run():
     for f in files:
         print(f"  - {f}")
     print("\nGenerating commit message...")
-
+    config = KomitConfig(model=args.model,
+                         style=args.style,
+                         max_diff_length=args.max_diff,
+                         ollama_url=args.ollama_url
+                         )
+    print(f"\nGenerating commit message... (style: {config.style}, model: {config.model})")
     try:
-        config = KomitConfig()
+
         message= generate_message(diff=diff,config=config)
     except RuntimeError as e:
         print(f"Error: {e}")

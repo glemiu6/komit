@@ -1,8 +1,18 @@
 """
 Shared pytest fixtures for the komit test suite.
 """
+import sys
 import pytest
+from unittest.mock import patch
 from komit.komitconfig import KomitConfig
+
+
+@pytest.fixture(autouse=True)
+def reset_argv():
+    """Ensure sys.argv is always just ['komit'] so argparse doesn't
+    pick up pytest's own arguments during tests."""
+    with patch.object(sys, "argv", ["komit"]):
+        yield
 
 
 @pytest.fixture
