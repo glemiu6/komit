@@ -193,4 +193,4 @@ pip uninstall komit
 
 ## License
 
-[MIT](LICENSE)
+[Apache License](LICENSE)

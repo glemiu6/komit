@@ -1,10 +1,11 @@
+#komit/git_utils.py
 import subprocess
 
 def get_stage_diff() ->str:
     result = subprocess.run(['git','diff','--staged'],capture_output=True,text=True)
     return result.stdout
 
-def get_stage_filer()->list[str]:
+def get_stage_files()->list[str]:
     result = subprocess.run(['git','diff','--staged','--name-only'],capture_output=True,text=True)
     return [f for f in result.stdout.strip().split('\n') if f]
 
