@@ -8,15 +8,18 @@ on:
 
 jobs:
   build:
+    # Fix: grant permission to create and upload to GitHub Releases
+    permissions:
+      contents: write
+
     strategy:
       matrix:
         include:
           - os: ubuntu-latest
             name: komit-linux-x86_64
-
-          - os: macos-13        # macos-13 is the last Intel runner
+          - os: macos-13
             name: komit-macos-x86_64
-          - os: macos-latest    # macos-latest is ARM (M1+)
+          - os: macos-latest
             name: komit-macos-arm64
           - os: windows-latest
             name: komit-windows-x86_64.exe
@@ -24,10 +27,10 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.2.2
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v5.6.0
         with:
           python-version: "3.13"
 
@@ -48,20 +51,24 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
 
+    permissions:
+      id-token: write
+      contents: read
+
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.2.2
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v5.6.0
         with:
           python-version: "3.13"
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v3
+        uses: astral-sh/setup-uv@v6
 
       - name: Build package
         run: |
-          uv sync --dev   
+          uv sync --dev
           uv run python -m build
 
       - name: Publish to PyPI
