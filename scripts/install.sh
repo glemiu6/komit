@@ -1,10 +1,11 @@
 #!/bin/bash
+#scripts/install.sh
 set -e
 
 OS=$(uname -s)
 ARCH=$(uname -m)
 REPO="https://github.com/glemiu6/komit"
-LATEST=$(curl -fsSL "$REPO/releases/latest" | grep '"teg_name"' | sed 's/.*"tag_name": *"\*([^"]*\)".*/\1/')
+LATEST=$(curl -fsSL "$REPO/releases/latest" | grep -oP '"tag_name":\s*"K[^"]+' )
 
 echo "Installing komit $LATEST..."
 
@@ -40,7 +41,7 @@ sudo mv komit /usr/local/bin/
 echo ""
 echo "komit installed successfully!"
 echo "Run 'komit' to get started."
-exho ""
-echo "Setup get alias:"
+echo ""
+echo "Setup git alias:"
 echo " git config --global alias.ai '!komit'"
 echo "Then use: git ai"

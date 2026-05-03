@@ -34,7 +34,7 @@ AI-powered git commit message generator using local LLMs via Ollama. No API keys
 ### Option 1 — One line install (no Python required)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/glemiu6/komit/main/scripts/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/glemiu6/komit/master/scripts/install.sh | bash
 ```
 
 ### Option 2 — pip
@@ -115,7 +115,7 @@ Use this message? (y/n/e to edit/r to regenerate):
 
 ## Commit Styles
 
-Configure in `config.py` or pass as argument:
+Configure in `komitconfig.py` or pass as argument:
 
 **Conventional** (default):
 ```
@@ -144,7 +144,7 @@ feat: add user authentication
 
 ## Configuration
 
-Edit `komit/config.py`:
+Edit `komit/komitconfig.py`:
 
 ```python
 @dataclass

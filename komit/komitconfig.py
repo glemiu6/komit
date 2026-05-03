@@ -1,8 +1,8 @@
-#komit/config.py
+#komit/komitconfig.py
 from dataclasses import dataclass
 
 @dataclass
-class Config:
+class KomitConfig:
     model:str ='qwen2.5:7b'
     style:str ='conventional'
     max_diff_length:int = 4000

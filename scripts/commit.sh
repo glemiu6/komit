@@ -1,5 +1,5 @@
 #!/bin/bash
-
+#scripts/commit.sh
 if command -v komit &> /dev/null; then
   komit
 elif command -v python3 &> /dev/null; then

@@ -1,5 +1,5 @@
 #!/bin/bash
-
+#scripts/uninstall.sh
 echo "Uninstalling komit..."
 
 sudo rm -f /usr/local/bin/komit

@@ -1,3 +1,4 @@
+# .github/workflows/publish.yaml
 name: Publish
 
 on:
@@ -12,7 +13,10 @@ jobs:
         include:
           - os: ubuntu-latest
             name: komit-linux-x86_64
-          - os: macos-latest
+
+          - os: macos-13        # macos-13 is the last Intel runner
+            name: komit-macos-x86_64
+          - os: macos-latest    # macos-latest is ARM (M1+)
             name: komit-macos-arm64
           - os: windows-latest
             name: komit-windows-x86_64.exe
@@ -28,15 +32,13 @@ jobs:
           python-version: "3.13"
 
       - name: Install dependencies
-        run: |
-          pip install pyinstaller ollama
+        run: pip install pyinstaller ollama
 
       - name: Build binary
-        run: |
-          pyinstaller --onefile komit/main.py --name ${{ matrix.name }}
+        run: pyinstaller --onefile komit/main.py --name ${{ matrix.name }}
 
       - name: Upload binary to release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: dist/${{ matrix.name }}
         env:
@@ -59,7 +61,7 @@ jobs:
 
       - name: Build package
         run: |
-          uv sync --group dev
+          uv sync --dev   
           uv run python -m build
 
       - name: Publish to PyPI

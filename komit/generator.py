@@ -1,5 +1,5 @@
 #komit/generator.py
-from komit.config import Config
+from komit.komitconfig import KomitConfig
 STYLES ={
     "conventional":("Generate a conventional commit message (type: description).\n"
                     "Types: feat, fix, docs, style, refactor, test, chore.\n"
@@ -17,13 +17,13 @@ STYLES ={
                 "Just the message, nothing else"),
 }
 
-def generate_message(diff:str,config:Config|None=None):
-    config = config or Config()
+def generate_message(diff:str, config: KomitConfig | None=None):
+    config = config or KomitConfig()
 
     #truncate large diff
     if len(diff)>config.max_diff_length:
         diff = diff[:config.max_diff_length]+"\n... (truncated)"
-    style_prompt = STYLES.get(config.style,"conventional")
+    style_prompt = STYLES.get(config.style,STYLES["conventional"])
     try:
         from ollama import Client
         client = Client(host=config.ollama_url)
