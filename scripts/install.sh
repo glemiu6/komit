@@ -6,8 +6,7 @@ ARCH=$(uname -m)
 REPO="https://github.com/glemiu6/komit"
 
 # Use sed instead of grep -oP for macOS/Linux compatibility
-LATEST=$(curl -fsSL "$REPO/releases/latest" | sed -n 's/.*"tag_name": *"\([^"]*\)".*/\1/p')
-
+LATEST=$(curl -fsSL "https://api.github.com/repos/glemiu6/komit/releases/latest" | sed -n 's/.*"tag_name": *"\([^"]*\)".*/\1/p')
 if [ -z "$LATEST" ]; then
     echo "Error: could not determine latest release version."
     exit 1
