@@ -5,7 +5,7 @@ set -e
 OS=$(uname -s)
 ARCH=$(uname -m)
 REPO="https://github.com/glemiu6/komit"
-LATEST=$(curl -fsSL "$REPO/releases/latest" | grep -oP '"tag_name":\s*"K[^"]+' )
+LATEST=$(curl -fsSL "$REPO/releases/latest" | grep -oP '"tag_name":\s*"\K[^"]+' )
 
 echo "Installing komit $LATEST..."
 
