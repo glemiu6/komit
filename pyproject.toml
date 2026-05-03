@@ -1,0 +1,26 @@
+[project]
+name = "komit"
+version = "0.1.0"
+description = "AI-powered git commit message generator using local LLMs"
+readme = "README.md"
+requires-python = ">=3.14"
+license = { text = "MIT" }
+authors = [
+    { name = "Vlad Digori", email = "digorivlad59@gmail.com" }
+]
+keywords = ["git", "commit", "ai", "llm", "ollama", "developer-tools"]
+dependencies = [
+    "ollama>=0.4.0",
+]
+
+[project.scripts]
+komit = "komit.main:run"
+git-ai = "komit.main:run"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0.0",
+    "build>=1.4.4",
+    "twine>=6.2.0",
+    "pyinstaller>=6.0.0",
+]
