@@ -108,7 +108,7 @@ Features are grouped by phase, ordered by priority.
 ---
 
 ## Phase 8 — Distribution
-> Goal: installable everywhere
+> Goal: installable everywhere, across platforms and architectures
 
 | Feature | Status |
 |---------|-------|
@@ -117,6 +117,7 @@ Features are grouped by phase, ordered by priority.
 | `komit update` self-update command | 📋 |
 | Dependabot for dependency updates | 📋 |
 | Update scripts via curl/irm (Linux, macOS, Windows) | 📋 |
+| Linux ARM64 binary support (`komit-linux-arm64`) | 📋 |
 
 ---
 
