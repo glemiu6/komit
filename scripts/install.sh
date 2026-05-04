@@ -2,7 +2,6 @@
 set -e
 
 REPO="https://github.com/glemiu6/komit"
-RAW="https://raw.githubusercontent.com/glemiu6/komit/master"
 detect_platform() {
   OS=$(uname -s)
   ARCH=$(uname -m)
@@ -49,12 +48,12 @@ download_binary() {
 }
 
 install_updater() {
-  cat > /tmp/komit-update << EOF
-#!bin/bash
-curl -fsSL $RAW/scripts/install.sh | bash
+  cat > /tmp/komit-update << 'EOF'
+#!/bin/bash
+curl -fsSL https://raw.githubusercontent.com/glemiu6/komit/master/scripts/install.sh | bash
 EOF
-  sudo mv /tmp/komit-update /usr/local/bin/komit-update
-  sudo chmod +x /usr/local/bin/komit-update
+  sudo mv /tmp/komit-update /usr/local/bin/komit-update-binary
+  sudo chmod +x /usr/local/bin/komit-update-binary
 }
 
 print_success() {
