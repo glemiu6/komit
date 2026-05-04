@@ -6,28 +6,7 @@ import argparse
 from komit.git_utils import get_staged_files,get_staged_diff,is_git_repo,commit,commit_with_editor
 from komit.generator import generate_message,STYLES
 from komit.komitconfig import KomitConfig
-def check_for_updates():
-    try:
-        import httpx
-        from komit import __version__
-        response= httpx.get(
-            "https://api.github.com/repos/glemiu6/komit/releases/latest",
-            timeout=2
-        )
-        latest= response.json()["tag_name"].lstrip("v")
-        if latest != __version__:
-            print(f"!!  New version available: v{latest} (you have v{__version__})")
-            print(f"    Run: komit-update\n")
-    except Exception:
-        pass
-
-#update for when using pip install komit
-def update()->None:
-    print("Updating komit...")
-    result = subprocess.run(["curl","-fsSL","https://raw.githubusercontent.com/glemiu6/komit/master/scripts/install.sh"],capture_output=True,text=True)
-    subprocess.run(['bash'],input=result.stdout)
-    print("Done!")
-
+from komit.update_utils import update,check_for_updates
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -84,7 +63,6 @@ def run():
     print(f"\nStaged files ({len(files)}):")
     for f in files:
         print(f"  - {f}")
-    print("\nGenerating commit message...")
     config = KomitConfig(model=args.model,
                          style=args.style,
                          max_diff_length=args.max_diff,
