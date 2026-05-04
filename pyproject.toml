@@ -9,6 +9,11 @@ authors = [
     { name = "Vlad Digori", email = "digorivlad59@gmail.com" }
 ]
 keywords = ["git", "commit", "ai", "llm", "ollama", "developer-tools"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
 dependencies = [
     "httpx>=0.28.1",
     "ollama>=0.4.0",

@@ -7,8 +7,8 @@ AI-powered git commit message generator using local LLMs via Ollama. No API keys
 [![PyPI](https://img.shields.io/pypi/v/komit)](https://pypi.org/project/komit)
 [![Python](https://img.shields.io/badge/python-3.13+-blue)](https://www.python.org)
 [![License](https://img.shields.io/github/license/glemiu6/komit)](https://github.com/glemiu6/komit/blob/master/LICENSE)
-[![Downloads](https://img.shields.io/pypi/dm/komit)](https://pypi.org/project/komit)
-
+[![Downloads](https://static.pepy.tech/badge/komit)](https://pepy.tech/project/komit)
+[![Downloads](https://static.pepy.tech/badge/komit/month)](https://pepy.tech/project/komit)  
 📍 [View the roadmap](ROADMAP.md) · [Open an issue](https://github.com/glemiu6/komit/issues) · [Changelog](CHANGELOG.md)
 
 ---
