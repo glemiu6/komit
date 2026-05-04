@@ -8,6 +8,14 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- `komit-update` command — update via pip for pip users
+- `komit-update-binary` command — update via curl for binary users  
+- `komit-uninstall` command — remove komit, config, and git alias in one command
+- Automatic update check on startup via `check_for_updates()`
+- `update_utils.py` — dedicated module for update/uninstall logic
+- PowerShell install/uninstall/update scripts for Windows
+
 ---
 ## [0.2.2] - 2026-05-05
 

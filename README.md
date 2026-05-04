@@ -9,6 +9,8 @@ AI-powered git commit message generator using local LLMs via Ollama. No API keys
 [![License](https://img.shields.io/github/license/glemiu6/komit)](https://github.com/glemiu6/komit/blob/master/LICENSE)
 [![Downloads](https://img.shields.io/pypi/dm/komit)](https://pypi.org/project/komit)
 
+📍 [View the roadmap](ROADMAP.md) · [Open an issue](https://github.com/glemiu6/komit/issues) · [Changelog](CHANGELOG.md)
+
 ---
 
 ## Features
@@ -18,20 +20,9 @@ AI-powered git commit message generator using local LLMs via Ollama. No API keys
 - 🔄 **Regenerate** — not happy? generate a new message instantly
 - ✏️ **Edit before commit** — open your editor to tweak the message
 - ⚙️ **CLI flags** — control style, model, and more from the command line
+- 🔔 **Auto update check** — notifies you when a new version is available
 - 🌍 **Universal** — works via pip, binary, or shell script
 - ⚡ **Fast** — runs on your machine, no network calls to external APIs
-
----
-
-## Update
-
-```bash
-komit-update
-```
-
-Or reinstall via your original method.
-
-> komit automatically checks for updates on startup and notifies you when a new version is available.
 
 ---
 
@@ -42,9 +33,7 @@ Or reinstall via your original method.
 
 ---
 
-
-
-## Recommended Models
+## Recommended models
 
 | Model | Size | Best for |
 |-------|------|----------|
@@ -57,29 +46,31 @@ ollama pull qwen2.5:7b
 ```
 
 ---
+
 ## Installation
 
-### Option 1 — One line install (no Python required)
+### Linux / macOS — one line
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/glemiu6/komit/master/scripts/install.sh | bash
 ```
 
-### Option 2 — pip
+
+### pip
 
 ```bash
 pip install komit
 ```
 
-### Option 3 — pipx (recommended for CLI tools)
+### pipx (recommended for CLI tools)
 
 ```bash
 pipx install komit
 ```
 
-### Option 4 — Download binary
+### Download binary manually
 
-Download the binary for your platform from [GitHub Releases](https://github.com/glemiu6/komit/releases/latest):
+Download for your platform from [GitHub Releases](https://github.com/glemiu6/komit/releases/latest):
 
 | Platform            | Binary                      |
 |---------------------|-----------------------------|
@@ -90,7 +81,7 @@ Download the binary for your platform from [GitHub Releases](https://github.com/
 > Intel Mac users: use `pip install komit` instead.
 
 ```bash
-# Linux/Mac
+# Linux/macOS
 chmod +x komit-*
 sudo mv komit-* /usr/local/bin/komit
 ```
@@ -115,14 +106,11 @@ Now you can use `git ai` as a shortcut.
 # Stage your changes
 git add .
 
-# Generate commit message
+# Generate a commit message
 komit
 
 # Or via git alias
 git ai
-
-# Or via shell script
-./scripts/commit.sh
 ```
 
 ### CLI flags
@@ -141,19 +129,10 @@ komit [--style STYLE] [--model MODEL] [--ollama-url URL] [--max-diff N]
 ### Examples
 
 ```bash
-# Use simple style
 komit --style simple
-
-# Use a faster model
 komit --model llama3.2:3b
-
-# Use detailed style with a different model
 komit --style detailed --model mistral:7b
-
-# Connect to a remote Ollama instance
 komit --ollama-url http://192.168.1.10:11434
-
-# Limit diff size for large changesets
 komit --max-diff 2000
 ```
 
@@ -182,7 +161,7 @@ Use this message? (y/n/e to edit/r to regenerate):
 
 ---
 
-## Commit Styles
+## Commit styles
 
 ### Conventional (default)
 
@@ -210,17 +189,40 @@ feat: add user authentication
 - Add refresh token support
 ```
 
+---
+
+## Update
+
+komit automatically checks for updates on startup and notifies you when a new version is available.
+
+**pip / pipx users**
+```bash
+komit-update
+```
+
+**curl / binary users**
+```bash
+komit-update-binary
+```
+
 
 
 ---
 
 ## Uninstall
 
+**All platforms — removes binary, config, and git alias**
 ```bash
-./scripts/uninstall.sh
-# or
+komit-uninstall
+```
+
+**pip**
+```bash
 pip uninstall komit
-# or
+```
+
+**pipx**
+```bash
 pipx uninstall komit
 ```
 
@@ -228,11 +230,13 @@ pipx uninstall komit
 
 ## Contributing
 
+See [CONTRIBUTING.md](CONTRIBUTING.md) for setup instructions and guidelines.
+
 1. Fork the repo
 2. Create a feature branch (`git checkout -b feature-name`)
-3. Commit your changes (`komit` 😉)
-4. Push to the branch (`git push origin feature-name`)
-5. Open a Pull Request
+3. Make your changes and add tests
+4. Commit your changes (`komit` 😉)
+5. Push and open a Pull Request
 
 ---
 
