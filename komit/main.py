@@ -6,7 +6,7 @@ import argparse
 from komit.git_utils import get_staged_files,get_staged_diff,is_git_repo,commit,commit_with_editor
 from komit.generator import generate_message,STYLES
 from komit.komitconfig import KomitConfig
-from komit.update_utils import update,check_for_updates
+from komit.update_utils import check_for_updates
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -48,9 +48,6 @@ def parse_args():
     return parser.parse_args()
 def run():
     args = parse_args()
-    if args.command == 'update':
-        update()
-        return
     check_for_updates()
     if not is_git_repo():
         print("Not a git repository")
