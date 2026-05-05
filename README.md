@@ -195,14 +195,9 @@ feat: add user authentication
 
 komit automatically checks for updates on startup and notifies you when a new version is available.
 
-**pip / pipx users**
-```bash
-komit-update
-```
 
-**curl / binary users**
 ```bash
-komit-update-binary
+komit update
 ```
 
 
@@ -212,18 +207,8 @@ komit-update-binary
 ## Uninstall
 
 **All platforms — removes binary, config, and git alias**
-```bash
-komit-uninstall
 ```
-
-**pip**
-```bash
-pip uninstall komit
-```
-
-**pipx**
-```bash
-pipx uninstall komit
+komit uninstall
 ```
 
 ---

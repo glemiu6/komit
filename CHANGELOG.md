@@ -8,6 +8,15 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- `komit update` command - update for everytype of installations
+- `komit uninstall` command - uninstall komit for everytype of installations
+- `scripts/install.sh` - check where to install komit `usr/local/bin`->Linux or `/opt/homebrew/bin`->macOS or for all `~/.local/bin`
+- `komit init` command - interactive setup wizard to create config file
+
+### Changed
+- `komit-update`/`komit-update-binary`/`komit-uninstall` commands no longer needed
+
 ---
 ## [0.2.5] - 2026-05-05
 

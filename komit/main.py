@@ -6,7 +6,7 @@ import argparse
 from komit.git_utils import get_staged_files,get_staged_diff,is_git_repo,commit,commit_with_editor
 from komit.generator import generate_message,STYLES
 from komit.komitconfig import KomitConfig
-from komit.update_utils import check_for_updates
+from komit.update_utils import check_for_updates,update,uninstall
 from komit import __version__
 from komit.config_utils import init_config
 
@@ -70,12 +70,26 @@ def parse_args(argv=None):
         'init',
         help="Create a config file"
     )
+    subparser.add_parser(
+        'update',
+        help="Update komit to the latest version"
+    )
+    subparser.add_parser(
+        'uninstall',
+        help="Uninstall komit"
+    )
     return parser.parse_args(argv)
 def run():
     args = parse_args()
 
     if args.command == 'init':
         init_config()
+        return
+    if args.command == 'uninstall':
+        uninstall()
+        return
+    if args.command == 'update':
+        update()
         return
     check_for_updates()
     if not is_git_repo():

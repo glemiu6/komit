@@ -38,30 +38,45 @@ get_latest_version() {
     exit 1
   fi
 }
-
 download_binary() {
   URL="$REPO/releases/download/$LATEST/$BINARY"
   echo "Downloading from $URL..."
   curl -fsSL "$URL" -o komit
   chmod +x komit
-  sudo mv komit /usr/local/bin/
+
+  # Detect install dir
+  if [ -d "/usr/local/bin" ] && [ -w "/usr/local/bin" ]; then
+    INSTALL_DIR="/usr/local/bin"
+  elif [ -d "/opt/homebrew/bin" ] && [ -w "/opt/homebrew/bin" ]; then
+    INSTALL_DIR="/opt/homebrew/bin"
+  else
+    INSTALL_DIR="$HOME/.local/bin"
+    mkdir -p "$INSTALL_DIR"
+  fi
+
+  echo "Installing to $INSTALL_DIR"
+
+  if [ "$INSTALL_DIR" = "$HOME/.local/bin" ]; then
+    mv komit "$INSTALL_DIR/komit"
+    if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
+      echo ""
+      echo "Add this to your ~/.bashrc or ~/.zshrc:"
+      echo "  export PATH=\"\$HOME/.local/bin:\$PATH\" "
+    fi
+  else
+    sudo mv komit "$INSTALL_DIR/komit"
+  fi
 }
 
-install_updater() {
-  cat > /tmp/komit-update << 'EOF'
-#!/bin/bash
-curl -fsSL https://raw.githubusercontent.com/glemiu6/komit/master/scripts/install.sh | bash
-EOF
-  sudo mv /tmp/komit-update /usr/local/bin/komit-update-binary
-  sudo chmod +x /usr/local/bin/komit-update-binary
-}
 
 print_success() {
   echo ""
   echo "komit $LATEST installed successfully"
   echo ""
   echo "Run 'komit' to get started"
-  echo "Run 'komit-update' to update"
+  echo "Run 'komit init' to setup a config file"
+  echo "Run 'komit update' to update"
+  echo "Run 'komit uninstall' to uninstall"
   echo ""
   echo "Setup git alias:"
   echo "  git config --global alias.ai '!komit'"
@@ -72,5 +87,4 @@ detect_platform
 get_latest_version
 echo "Installing komit $LATEST"
 download_binary
-install_updater
 print_success

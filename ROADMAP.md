@@ -10,24 +10,23 @@ Features are grouped by phase, ordered by priority.
 ## Phase 1 — Solid foundation
 > Goal: komit feels like a proper CLI tool
 
-| Feature | Status |
-|---------|--------|
-| Core commit generation via Ollama | ✅ |
-| Multiple commit styles (conventional, simple, detailed) | ✅ |
+| Feature                                                  | Status |
+|----------------------------------------------------------|--------|
+| Core commit generation via Ollama                        | ✅ |
+| Multiple commit styles (conventional, simple, detailed)  | ✅ |
 | `--style`, `--model`, `--ollama-url`, `--max-diff` flags | ✅ |
-| Published to PyPI | ✅ |
-| Binary releases (Linux, macOS, Windows) | ✅ |
-| CI/CD with GitHub Actions | ✅ |
-| Config file (`~/.config/komit/config.toml`) | ✅ |
-| `komit init` — interactive setup wizard | ✅ |
-| `--version` flag | ✅ |
-| `--dry-run` flag | ✅ |
-| Ollama running check with friendly error | 📋 |
-| Model existence check with pull suggestion | 📋 |
-| Timeout handling for LLM calls | 📋 |
-| `scripts/update.ps1` — update script for Windows | 📋 |
-| `scripts/install.ps1` — install script for Windows | 📋 |
-| `scripts/uninstall.ps1` — uninstall script for Windows | 📋 |
+| Published to PyPI                                        | ✅ |
+| Binary releases (Linux, macOS, Windows)                  | ✅ |
+| CI/CD with GitHub Actions                                | ✅ |
+| Config file (`~/.config/komit/config.toml`)              | ✅ |
+| `komit init` — interactive setup wizard                  | ✅ |
+| `--version` flag                                         | ✅ |
+| `--dry-run` flag                                         | ✅ |
+| Ollama running check with friendly error                 | 📋 |
+| Model existence check with pull suggestion               | 📋 |
+| Timeout handling for LLM calls                           | 📋 |
+| Create script for windows support                        | 📋 |
+
 
 
 ---
@@ -99,7 +98,7 @@ Features are grouped by phase, ordered by priority.
 
 | Feature | Status |
 |---------|--------|
-| `CHANGELOG.md` (Keep a Changelog format) | 📋 |
+| `CHANGELOG.md` (Keep a Changelog format) | ✅ |
 | `CONTRIBUTING.md` | 📋 |
 | GitHub issue templates (bug + feature request) | 📋 |
 | Auto changelog with git-cliff | 📋 |
