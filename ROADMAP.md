@@ -18,11 +18,10 @@ Features are grouped by phase, ordered by priority.
 | Published to PyPI | ✅ |
 | Binary releases (Linux, macOS, Windows) | ✅ |
 | CI/CD with GitHub Actions | ✅ |
-| `scripts/update.sh` — update script for Linux/macOS | ✅ |
-| Config file (`~/.config/komit/config.toml`) | 📋 |
-| `komit init` — interactive setup wizard | 📋 |
-| `--version` flag | 📋 |
-| `--dry-run` flag | 📋 |
+| Config file (`~/.config/komit/config.toml`) | ✅ |
+| `komit init` — interactive setup wizard | ✅ |
+| `--version` flag | ✅ |
+| `--dry-run` flag | ✅ |
 | Ollama running check with friendly error | 📋 |
 | Model existence check with pull suggestion | 📋 |
 | Timeout handling for LLM calls | 📋 |

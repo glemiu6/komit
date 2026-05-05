@@ -1,22 +1,74 @@
 # .github/workflows/release.yaml
-name: Test
+name: Release
 
 on:
   push:
-    branches: [master]
-  pull_request:
-    branches: [master]
+    tags:
+      - "v*"
 
 jobs:
-  test:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-
+  # ----------------------------
+  # Build binaries
+  # ----------------------------
+  build:
+    name: Build ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
 
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            name: komit-linux-x86_64
+          - os: macos-latest
+            name: komit-macos-arm64
+          - os: windows-latest
+            name: komit-windows-x86_64
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        # Fix: include ollama so PyInstaller can bundle it
+        run: pip install pyinstaller ollama httpx platformdirs
+
+      - name: Build binary
+        run: pyinstaller --onefile komit/main.py --name ${{ matrix.name }}
+
+      - name: Upload artifact (Unix)
+        if: runner.os != 'Windows'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.name }}
+          path: dist/${{ matrix.name }}
+
+      - name: Upload artifact (Windows)
+        if: runner.os == 'Windows'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.name }}
+          # Fix: PyInstaller adds .exe automatically on Windows
+          path: dist/${{ matrix.name }}.exe
+
+  # ----------------------------
+  # Publish to PyPI
+  # ----------------------------
+  publish-pypi:
+    name: Publish to PyPI
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -24,10 +76,43 @@ jobs:
           python-version: "3.13"
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v3
+        uses: astral-sh/setup-uv@v6
 
-      - name: Install dependencies
-        run: uv sync --dev
+      - name: Install dependencies and build
+        run: |
+          uv sync --dev
+          uv run python -m build
 
-      - name: Run tests
-        run: uv run pytest tests/ -v
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.PYPI_API_TOKEN }}
+
+  # ----------------------------
+  # Create GitHub Release + attach binaries
+  # ----------------------------
+  github-release:
+    name: GitHub Release
+    # Fix: now depends on build job in the SAME workflow
+    # so artifacts are available to download
+    needs: [build, publish-pypi]
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts/
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/**/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

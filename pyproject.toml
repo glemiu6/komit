@@ -1,6 +1,6 @@
 [project]
 name = "komit"
-version = "0.2.4"
+version = "0.2.5"
 description = "AI-powered git commit message generator using local LLMs"
 readme = "README.md"
 requires-python = ">=3.13"
@@ -17,6 +17,7 @@ classifiers = [
 dependencies = [
     "httpx>=0.28.1",
     "ollama>=0.4.0",
+    "platformdirs>=4.9.6",
 ]
 
 [project.scripts]

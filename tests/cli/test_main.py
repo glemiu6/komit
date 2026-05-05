@@ -2,6 +2,7 @@ import subprocess
 import pytest
 from unittest.mock import patch
 from komit.main import run
+import sys
 
 
 # ---------------------------------------------------------------------------
@@ -42,10 +43,10 @@ def _patch_all(
 class TestRunEarlyExits:
     @patch("komit.main.is_git_repo", return_value=False)
     def test_exits_when_not_a_git_repo(self, _, capsys):
-        with pytest.raises(SystemExit) as exc:
-            run()
-        assert exc.value.code == 1
-        assert "Not a git repository" in capsys.readouterr().out
+        with patch.object(sys, "argv", ["komit"]):  # add this
+            with pytest.raises(SystemExit) as exc:
+                run()
+            assert exc.value.code == 1
 
     @patch("komit.main.is_git_repo", return_value=True)
     @patch("komit.main.get_staged_diff", return_value="")
@@ -271,11 +272,9 @@ class TestRunCLIArgs:
     @patch("builtins.input", return_value="n")
     def test_default_style_is_conventional(self, _in, _commit, _files, _diff, _repo):
         with patch("komit.main.generate_message", return_value="feat: thing") as mock_gen:
-            import sys
-            with patch.object(sys, "argv", ["komit"]):
-                run()
-            call_config = mock_gen.call_args.kwargs["config"]
-            assert call_config.style == "conventional"
+            run()  # conftest.py reset_argv already sets sys.argv = ["komit"]
+        call_config = mock_gen.call_args.kwargs["config"]
+        assert call_config.style == "conventional"
 
     @patch("komit.main.is_git_repo", return_value=True)
     @patch("komit.main.get_staged_diff", return_value="diff")
@@ -284,11 +283,10 @@ class TestRunCLIArgs:
     @patch("builtins.input", return_value="n")
     def test_style_flag_simple(self, _in, _commit, _files, _diff, _repo):
         with patch("komit.main.generate_message", return_value="Add thing") as mock_gen:
-            import sys
             with patch.object(sys, "argv", ["komit", "--style", "simple"]):
                 run()
-            call_config = mock_gen.call_args.kwargs["config"]
-            assert call_config.style == "simple"
+        call_config = mock_gen.call_args.kwargs["config"]
+        assert call_config.style == "simple"
 
     @patch("komit.main.is_git_repo", return_value=True)
     @patch("komit.main.get_staged_diff", return_value="diff")

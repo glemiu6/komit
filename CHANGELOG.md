@@ -8,13 +8,43 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+---
+## [0.2.5] - 2026-05-05
+
 ### Added
 - `komit-update` command — update via pip for pip users
 - `komit-update-binary` command — update via curl for binary users  
 - `komit-uninstall` command — remove komit, config, and git alias in one command
 - Automatic update check on startup via `check_for_updates()`
 - `update_utils.py` — dedicated module for update/uninstall logic
-- PowerShell install/uninstall/update scripts for Windows
+- Config file support (`~/.config/komit/config.toml`) via `platformdirs`
+- `komit init` — interactive setup wizard to create config file
+- `--dry-run` / `-dr` flag — generate message without committing
+- `--version` flag — print current version
+- `--config` flag — path to custom config file
+- `KomitConfig.from_sources()` — merges CLI flags, config file, and defaults
+- `config_utils.py` — config file loading and init logic
+- Tests reorganized into `tests/cli/` and `tests/unit/`
+
+### Fixed
+- Merged `build.yaml` into `release.yaml` — artifacts now transfer correctly
+- Fixed Windows binary artifact path (`.exe` suffix handling)
+- Added `ollama`, `httpx`, `platformdirs` to PyInstaller dependencies
+- Fixed `ci.yaml` folder typo (`.github/workflow` → `.github/workflows`)
+- Updated `setup-uv` from `v3` to `v6`
+- Tests now isolated from real config file via `isolate_config` fixture
+
+### Changed
+- `KomitConfig` now supports merging from CLI args and config file
+- Test suite reorganized into `tests/cli/` and `tests/unit/` subdirectories
+
+---
+
+## [0.2.4] - 2026-05-04
+
+### Fixed
+- Removed stale `update` import from `main.py` causing ImportError on startup
+
 
 ---
 ## [0.2.2] - 2026-05-05
@@ -98,6 +128,7 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 - Published to PyPI
 
 [Unreleased]: https://github.com/glemiu6/komit/compare/v0.2.0...HEAD
+[0.2.5]: https://github.com/glemiu6/komit/compare/v0.2.4...v0.2.5
 [0.2.2]: https://github.com/glemiu6/komit/compare/v0.2.0...v0.2.2
 [0.2.0]: https://github.com/glemiu6/komit/compare/v0.1.3...v0.2.0
 [0.1.3]: https://github.com/glemiu6/komit/compare/v0.1.2...v0.1.3
