@@ -2,11 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
-This project adheres to [Semantic Versioning](https://semver.org/).
+
 
 ---
 
 ## [Unreleased]
+
+- Nothing yet
+
+---
+
+## [0.2.6] - 2026-05-06
 
 ### Added
 - `komit update` command - update for everytype of installations
@@ -137,6 +143,7 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 - Published to PyPI
 
 [Unreleased]: https://github.com/glemiu6/komit/compare/v0.2.0...HEAD
+[0.2.6]: https://github.com/glemiu6/komit/compare/v0.2.5...v0.2.6
 [0.2.5]: https://github.com/glemiu6/komit/compare/v0.2.4...v0.2.5
 [0.2.2]: https://github.com/glemiu6/komit/compare/v0.2.0...v0.2.2
 [0.2.0]: https://github.com/glemiu6/komit/compare/v0.1.3...v0.2.0
