@@ -2,12 +2,12 @@
 import subprocess
 
 def get_staged_diff() -> str:
-    result = subprocess.run(['git', 'diff', '--staged'], capture_output=True)
-    return result.stdout.decode('utf-8')
+    result = subprocess.run(['git', 'diff', '--staged'], capture_output=True,text=True)
+    return result.stdout
 
 def get_staged_files() -> list[str]:
-    result = subprocess.run(['git', 'diff', '--staged', '--name-only'], capture_output=True)
-    return [f for f in result.stdout.decode('utf-8').strip().split('\n') if f]
+    result = subprocess.run(['git', 'diff', '--staged', '--name-only'], capture_output=True,text=True)
+    return [f for f in result.stdout.strip().split('\n') if f]
 
 def commit(message:str):
     subprocess.run(
