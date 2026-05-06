@@ -14,7 +14,17 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - `generator/check_ollama_running` - checks ollama running
 
 ---
+## [0.2.9] - 2026-05-06
+### Added
 
+- `generator/model_exist` - checks if the model exists locally
+- `generator/check_ollama_running` - checks ollama running
+
+### Fix:
+- `workflow/release.yaml` - added `requests` dependencies
+
+
+---
 ## [0.2.6] - 2026-05-06
 
 ### Added
@@ -146,6 +156,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Published to PyPI
 
 [Unreleased]: https://github.com/glemiu6/komit/compare/v0.2.0...HEAD
+[0.2.9]: https://github.com/glemiu6/komit/compare/v0.2.6...v0.2.9
 [0.2.6]: https://github.com/glemiu6/komit/compare/v0.2.5...v0.2.6
 [0.2.5]: https://github.com/glemiu6/komit/compare/v0.2.4...v0.2.5
 [0.2.2]: https://github.com/glemiu6/komit/compare/v0.2.0...v0.2.2
