@@ -34,8 +34,12 @@ class TestDiffTruncation:
 
     # Client is imported lazily inside generate_message(), so we patch at the
     # source: ollama.Client — not komit.generator.Client.
+    @patch("komit.generator.model_exist", return_value=True)
+    @patch("komit.generator.check_ollama_running", return_value=True)
     @patch("ollama.Client")
-    def test_short_diff_is_not_truncated(self, mock_client_cls):
+    def test_short_diff_is_not_truncated(self, mock_client_cls,
+            mock_check,
+            mock_model_exist):
         mock_client_cls.return_value.chat.return_value = self._make_mock_response()
         config = KomitConfig(max_diff_length=4000)
         diff = "small diff"
@@ -44,8 +48,12 @@ class TestDiffTruncation:
         user_content = call_args.kwargs["messages"][1]["content"]
         assert "truncated" not in user_content
 
+    @patch("komit.generator.model_exist", return_value=True)
+    @patch("komit.generator.check_ollama_running", return_value=True)
     @patch("ollama.Client")
-    def test_long_diff_is_truncated(self, mock_client_cls):
+    def test_long_diff_is_truncated(self, mock_client_cls,
+            mock_check,
+            mock_model_exist):
         mock_client_cls.return_value.chat.return_value = self._make_mock_response()
         config = KomitConfig(max_diff_length=100)
         diff = "x" * 200
@@ -54,8 +62,12 @@ class TestDiffTruncation:
         user_content = call_args.kwargs["messages"][1]["content"]
         assert "truncated" in user_content
 
+    @patch("komit.generator.model_exist", return_value=True)
+    @patch("komit.generator.check_ollama_running", return_value=True)
     @patch("ollama.Client")
-    def test_truncated_diff_respects_max_length(self, mock_client_cls):
+    def test_truncated_diff_respects_max_length(self, mock_client_cls,
+            mock_check,
+            mock_model_exist):
         mock_client_cls.return_value.chat.return_value = self._make_mock_response()
         config = KomitConfig(max_diff_length=50)
         diff = "a" * 200
@@ -71,32 +83,48 @@ class TestStylePromptSelection:
         mock_response.message.content = content
         return mock_response
 
+    @patch("komit.generator.model_exist", return_value=True)
+    @patch("komit.generator.check_ollama_running", return_value=True)
     @patch("ollama.Client")
-    def test_conventional_style_sends_correct_prompt(self, mock_client_cls):
+    def test_conventional_style_sends_correct_prompt(self, mock_client_cls,
+            mock_check,
+            mock_model_exist):
         mock_client_cls.return_value.chat.return_value = self._make_mock_response()
         config = KomitConfig(style="conventional")
         generate_message("diff", config)
         system_content = mock_client_cls.return_value.chat.call_args.kwargs["messages"][0]["content"]
         assert system_content == STYLES["conventional"]
 
+    @patch("komit.generator.model_exist", return_value=True)
+    @patch("komit.generator.check_ollama_running", return_value=True)
     @patch("ollama.Client")
-    def test_simple_style_sends_correct_prompt(self, mock_client_cls):
+    def test_simple_style_sends_correct_prompt(self, mock_client_cls,
+            mock_check,
+            mock_model_exist):
         mock_client_cls.return_value.chat.return_value = self._make_mock_response()
         config = KomitConfig(style="simple")
         generate_message("diff", config)
         system_content = mock_client_cls.return_value.chat.call_args.kwargs["messages"][0]["content"]
         assert system_content == STYLES["simple"]
 
+    @patch("komit.generator.model_exist", return_value=True)
+    @patch("komit.generator.check_ollama_running", return_value=True)
     @patch("ollama.Client")
-    def test_detailed_style_sends_correct_prompt(self, mock_client_cls):
+    def test_detailed_style_sends_correct_prompt(self, mock_client_cls,
+            mock_check,
+            mock_model_exist):
         mock_client_cls.return_value.chat.return_value = self._make_mock_response()
         config = KomitConfig(style="detailed")
         generate_message("diff", config)
         system_content = mock_client_cls.return_value.chat.call_args.kwargs["messages"][0]["content"]
         assert system_content == STYLES["detailed"]
 
+    @patch("komit.generator.model_exist", return_value=True)
+    @patch("komit.generator.check_ollama_running", return_value=True)
     @patch("ollama.Client")
-    def test_unknown_style_falls_back_to_conventional_prompt(self, mock_client_cls):
+    def test_unknown_style_falls_back_to_conventional_prompt(self,mock_client_cls,
+            mock_check,
+            mock_model_exist):
         """Fix #10: fallback must be the actual prompt, not the string 'conventional'."""
         mock_client_cls.return_value.chat.return_value = self._make_mock_response()
         config = KomitConfig(style="nonexistent_style")
@@ -112,20 +140,32 @@ class TestGenerateMessageReturn:
         mock_response.message.content = content
         return mock_response
 
+    @patch("komit.generator.model_exist", return_value=True)
+    @patch("komit.generator.check_ollama_running", return_value=True)
     @patch("ollama.Client")
-    def test_returns_stripped_string(self, mock_client_cls):
+    def test_returns_stripped_string(self, mock_client_cls,
+            mock_check,
+            mock_model_exist):
         mock_client_cls.return_value.chat.return_value = self._make_mock_response("  feat: add thing  ")
         result = generate_message("diff")
         assert result == "feat: add thing"
 
+    @patch("komit.generator.model_exist", return_value=True)
+    @patch("komit.generator.check_ollama_running", return_value=True)
     @patch("ollama.Client")
-    def test_returns_correct_message(self, mock_client_cls):
+    def test_returns_correct_message(self, mock_client_cls,
+            mock_check,
+            mock_model_exist):
         mock_client_cls.return_value.chat.return_value = self._make_mock_response("fix: resolve null pointer")
         result = generate_message("diff", KomitConfig())
         assert result == "fix: resolve null pointer"
 
+    @patch("komit.generator.model_exist", return_value=True)
+    @patch("komit.generator.check_ollama_running", return_value=True)
     @patch("ollama.Client")
-    def test_uses_default_config_when_none_passed(self, mock_client_cls):
+    def test_uses_default_config_when_none_passed(self, mock_client_cls,
+            mock_check,
+            mock_model_exist):
         mock_client_cls.return_value.chat.return_value = self._make_mock_response("chore: update deps")
         result = generate_message("diff", None)
         assert result == "chore: update deps"
@@ -134,14 +174,22 @@ class TestGenerateMessageReturn:
 
 
 class TestGenerateMessageErrors:
+    @patch("komit.generator.model_exist", return_value=True)
+    @patch("komit.generator.check_ollama_running", return_value=True)
     @patch("ollama.Client")
-    def test_ollama_exception_raises_runtime_error(self, mock_client_cls):
+    def test_ollama_exception_raises_runtime_error(self, mock_client_cls,
+            mock_check,
+            mock_model_exist):
         mock_client_cls.return_value.chat.side_effect = Exception("connection refused")
         with pytest.raises(RuntimeError, match="Failed to generate commit message"):
             generate_message("diff", KomitConfig())
 
+    @patch("komit.generator.model_exist", return_value=True)
+    @patch("komit.generator.check_ollama_running", return_value=True)
     @patch("ollama.Client")
-    def test_runtime_error_contains_original_message(self, mock_client_cls):
+    def test_runtime_error_contains_original_message(self, mock_client_cls,
+            mock_check,
+            mock_model_exist):
         mock_client_cls.return_value.chat.side_effect = Exception("model not found")
         with pytest.raises(RuntimeError, match="model not found"):
             generate_message("diff", KomitConfig())
