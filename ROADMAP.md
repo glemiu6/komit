@@ -22,9 +22,9 @@ Features are grouped by phase, ordered by priority.
 | `komit init` — interactive setup wizard                  | ✅ |
 | `--version` flag                                         | ✅ |
 | `--dry-run` flag                                         | ✅ |
-| Ollama running check with friendly error                 | 📋 |
-| Model existence check with pull suggestion               | 📋 |
-| Timeout handling for LLM calls                           | 📋 |
+| Ollama running check with friendly error                 | ✅ |
+| Model existence check with pull suggestion               | ✅ |
+| Timeout handling for LLM calls                           | ✅ |
 | Create script for windows support                        | 📋 |
 
 

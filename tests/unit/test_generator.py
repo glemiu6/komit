@@ -146,10 +146,21 @@ class TestGenerateMessageErrors:
         with pytest.raises(RuntimeError, match="model not found"):
             generate_message("diff", KomitConfig())
 
+    @patch("komit.generator.model_exist", return_value=True)
+    @patch("komit.generator.check_ollama_running", return_value=True)
     @patch("ollama.Client")
-    def test_client_receives_correct_ollama_url(self, mock_client_cls):
-        mock_client_cls.return_value.chat.return_value = MagicMock()
-        mock_client_cls.return_value.chat.return_value.message.content = "feat: x"
+    def test_client_receives_correct_ollama_url(
+            self,
+            mock_client_cls,
+            mock_check,
+            mock_model_exist
+    ):
+        mock_client_instance = MagicMock()
+        mock_client_instance.chat.return_value.message.content = "feat: x"
+        mock_client_cls.return_value = mock_client_instance
+
         config = KomitConfig(ollama_url="http://myhost:11434")
+
         generate_message("diff", config)
+
         mock_client_cls.assert_called_once_with(host="http://myhost:11434")

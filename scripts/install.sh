@@ -43,29 +43,7 @@ download_binary() {
   echo "Downloading from $URL..."
   curl -fsSL "$URL" -o komit
   chmod +x komit
-
-  # Detect install dir
-  if [ -d "/usr/local/bin" ] && [ -w "/usr/local/bin" ]; then
-    INSTALL_DIR="/usr/local/bin"
-  elif [ -d "/opt/homebrew/bin" ] && [ -w "/opt/homebrew/bin" ]; then
-    INSTALL_DIR="/opt/homebrew/bin"
-  else
-    INSTALL_DIR="$HOME/.local/bin"
-    mkdir -p "$INSTALL_DIR"
-  fi
-
-  echo "Installing to $INSTALL_DIR"
-
-  if [ "$INSTALL_DIR" = "$HOME/.local/bin" ]; then
-    mv komit "$INSTALL_DIR/komit"
-    if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
-      echo ""
-      echo "Add this to your ~/.bashrc or ~/.zshrc:"
-      echo "  export PATH=\"\$HOME/.local/bin:\$PATH\" "
-    fi
-  else
-    sudo mv komit "$INSTALL_DIR/komit"
-  fi
+  sudo mv komit /usr/local/bin/
 }
 
 

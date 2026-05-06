@@ -8,7 +8,10 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
-- Nothing yet
+### Added
+
+- `generator/model_exist` - checks if the model exists locally
+- `generator/check_ollama_running` - checks ollama running
 
 ---
 

@@ -108,6 +108,9 @@ def run():
     try:
 
         message= generate_message(diff=diff,config=config)
+        if not message or not isinstance(message, str):
+            print("Invalid response from generator")
+            sys.exit(1)
     except RuntimeError as e:
         print(f"Error: {e}")
         sys.exit(1)
