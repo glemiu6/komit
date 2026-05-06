@@ -1,4 +1,6 @@
 import subprocess
+from idlelib.iomenu import encoding
+
 import pytest
 from unittest.mock import patch, MagicMock
 from komit.git_utils import (
@@ -31,7 +33,7 @@ class TestGetStagedDiff:
         get_staged_diff()
         mock_run.assert_called_once_with(
             ['git', 'diff', '--staged'],
-            capture_output=True, text=True
+            capture_output=True, text=True,encoding='utf-8'
         )
 
     @patch("komit.git_utils.subprocess.run")
@@ -67,7 +69,7 @@ class TestGetStagedFiles:
         get_staged_files()
         mock_run.assert_called_once_with(
             ['git', 'diff', '--staged', '--name-only'],
-            capture_output=True, text=True
+            capture_output=True, text=True,encoding='utf-8'
         )
 
     @patch("komit.git_utils.subprocess.run")
@@ -84,7 +86,7 @@ class TestCommit:
         commit("feat: add login")
         mock_run.assert_called_once_with(
             ['git', 'commit', '-m', 'feat: add login'],
-            check=True
+            check=True,encoding='utf-8'
         )
 
     @patch("komit.git_utils.subprocess.run")
@@ -109,7 +111,7 @@ class TestCommitWithEditor:
         commit_with_editor("feat: add login")
         mock_run.assert_called_once_with(
             ['git', 'commit', '-m', 'feat: add login', '-e'],
-            check=True
+            check=True,encoding='utf-8',text=True
         )
 
     @patch("komit.git_utils.subprocess.run")
@@ -137,5 +139,5 @@ class TestIsGitRepo:
         is_git_repo()
         mock_run.assert_called_once_with(
             ['git', 'rev-parse', '--is-inside-work-tree'],
-            capture_output=True, text=True
+            capture_output=True, text=True,encoding='utf-8'
         )
