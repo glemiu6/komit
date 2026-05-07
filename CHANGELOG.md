@@ -8,10 +8,9 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
-### Added
+### Fix
 
-- `generator/model_exist` - checks if the model exists locally
-- `generator/check_ollama_running` - checks ollama running
+- `git_utils.py` uses encoding `utf-8`
 
 ---
 ## [0.2.9] - 2026-05-06
@@ -20,7 +19,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - `generator/model_exist` - checks if the model exists locally
 - `generator/check_ollama_running` - checks ollama running
 
-### Fix:
+### Fix
 - `workflow/release.yaml` - added `requests` dependencies
 
 
