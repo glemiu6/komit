@@ -118,7 +118,7 @@ def update():
                 print("Please update manually.")
                 print("     pip install --upgrade komit")
                 print("     or")
-                print("     curl -fsSL https://raw.githubusercontent.com/glemiu6/komit/main/install.sh | sh")
+                print("     curl -fsSL https://raw.githubusercontent.com/glemiu6/komit/master/install.sh | sh")
         print("Update complete! Restart your terminal to use the latest version.")
     except Exception as e:
         print(f"Failed to update: {e}")
