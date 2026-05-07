@@ -78,7 +78,7 @@ Download for your platform from [GitHub Releases](https://github.com/glemiu6/kom
 | macOS Apple Silicon | `komit-macos-arm64`         |
 | Windows             | `komit-windows-x86_64.exe`  |
 
-> Intel Mac users: use `pip install komit` instead.
+> Intel Mac/Windows users: use `pip install komit` instead.
 
 ```bash
 # Linux/macOS

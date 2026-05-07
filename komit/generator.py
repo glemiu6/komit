@@ -1,5 +1,6 @@
 #komit/generator.py
 import requests
+import httpx
 from komit.komitconfig import KomitConfig
 STYLES ={
     "conventional":("Generate a conventional commit message (type: description).\n"
@@ -44,7 +45,7 @@ def generate_message(diff:str, config:KomitConfig | None=None):
         )
     try:
         from ollama import Client
-        client = Client(host=config.ollama_url)
+        client = Client(host=config.ollama_url, timeout=httpx.Timeout(config.timeout))
         if not model_exist(config.ollama_url,config.model):
             raise Exception(f"Model `{config.model}` not found locally.\n"
                             f"Run: `ollama pull {config.model}`")
@@ -61,5 +62,11 @@ def generate_message(diff:str, config:KomitConfig | None=None):
                                    }
                                ])
         return response.message.content.strip()
+    except httpx.TimeoutException:
+        raise RuntimeError(
+            f"Generation timed out after {config.timeout}s.\n"
+            "Try increasing the timeout or using a smaller model."
+        )
+
     except Exception as e:
         raise RuntimeError(f"Failed to generate commit message: {e}")

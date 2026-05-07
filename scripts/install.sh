@@ -13,13 +13,18 @@ detect_platform() {
           aarch64)  BINARY="komit-linux-arm64" ;;
           *)        echo "Unsupported architecture: $ARCH"; exit 1 ;;
         esac
+        INSTALL_DIR="/usr/local/bin"
         ;;
       Darwin)
         case $ARCH in
-          arm64)  BINARY="komit-macos-arm64" ;;
-          x86_64) echo "Intel Mac binary not available. Use: pip install komit"
-                  exit 1
-                  ;;
+          arm64)
+            BINARY="komit-macos-arm64"
+            INSTALL_DIR="/opt/homebrew/bin"
+            ;;
+          x86_64)
+            echo "Intel Mac binary not available. Use: pip install komit"
+            exit 1
+            ;;
           *)      echo "Unsupported architecture: $ARCH"; exit 1 ;;
         esac
         ;;
@@ -43,7 +48,12 @@ download_binary() {
   echo "Downloading from $URL..."
   curl -fsSL "$URL" -o komit
   chmod +x komit
-  sudo mv komit /usr/local/bin/
+  if [ ! -d "$INSTALL_DIR" ]; then
+    echo "Creating $INSTALL_DIR..."
+    sudo mkdir -p "$INSTALL_DIR"
+  fi
+  sudo mv komit "$INSTALL_DIR/"
+  echo "Installed to $INSTALL_DIR/komit"
 }
 
 

@@ -8,11 +8,21 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+Nothing yet
+
+---
+
+## [0.2.10] - 2026-05-07
+
 ### Fix
 
 - `git_utils.py` uses encoding `utf-8`
+- Timeout handling for LLM calls
+- `komit uninstall` command resolved issues with paths
+- `install.sh` detects the ARCH and installs in the appropriated path
+- `-timeout` flag added
 
----
+
 ## [0.2.9] - 2026-05-06
 ### Added
 
@@ -155,6 +165,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Published to PyPI
 
 [Unreleased]: https://github.com/glemiu6/komit/compare/v0.2.0...HEAD
+[0.2.10]: https://github.com/glemiu6/komit/compare/v0.2.9...v0.2.10
 [0.2.9]: https://github.com/glemiu6/komit/compare/v0.2.6...v0.2.9
 [0.2.6]: https://github.com/glemiu6/komit/compare/v0.2.5...v0.2.6
 [0.2.5]: https://github.com/glemiu6/komit/compare/v0.2.4...v0.2.5

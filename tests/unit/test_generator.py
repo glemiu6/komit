@@ -1,3 +1,4 @@
+import httpx
 import pytest
 from unittest.mock import MagicMock, patch
 from komit.komitconfig import KomitConfig
@@ -211,4 +212,4 @@ class TestGenerateMessageErrors:
 
         generate_message("diff", config)
 
-        mock_client_cls.assert_called_once_with(host="http://myhost:11434")
+        mock_client_cls.assert_called_once_with(host="http://myhost:11434", timeout=httpx.Timeout(timeout=60.0))

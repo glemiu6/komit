@@ -22,6 +22,7 @@ def init_config():
 style = "{style}"
 ollama_url = "{url}"
 max_diff_length = 4000
+timeout = 60
 """
     with open(paths,'w') as f:
         f.write(content.strip())

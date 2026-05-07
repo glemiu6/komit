@@ -24,6 +24,7 @@ def uninstall()->None:
     import shutil
     import os
     print("Uninstalling komit...")
+    method = _detect_install_method()
     #Remove git alias
     try:
         subprocess.run(['git','config','--global','--unset','alias.ai'],check=False)
@@ -53,11 +54,12 @@ def uninstall()->None:
             except subprocess.CalledProcessError:
                 print(f"Failed to remove {binary}: Try : sudo rm {binary}")
     #remove for pip
-    try:
-        subprocess.run([sys.executable,'-m','pip','uninstall','komit','-y'],check=True)
-        print("Removed pip package")
-    except subprocess.CalledProcessError:
-        pass
+    if method=='pip':
+        try:
+            subprocess.run([sys.executable,'-m','pip','uninstall','komit','-y'],check=False)
+            print("Removed pip package")
+        except subprocess.CalledProcessError:
+            pass
 
     print("\nkomit uninstalled. Goodbye!")
 

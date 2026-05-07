@@ -63,6 +63,13 @@ def parse_args(argv=None):
         type=str,
         help="Path to custom config file"
     )
+    # flag for timeout in LLM
+    parser.add_argument(
+        '--timeout',
+        type = int,
+        default = None,
+        help='LLM request timeout in seconds (default: 60)'
+    )
     #subparser for action commands
     subparser = parser.add_subparsers(dest='command')
     # flag from the action komit init
