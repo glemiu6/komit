@@ -108,7 +108,11 @@ def update():
                 subprocess.run([sys.executable, "-m", "pip", "install", "--upgrade", "komit"], check=True)
             case "binary":
                 print("Detected binary installation, updating...")
-                subprocess.run(["curl", "-fsSL", "https://raw.githubusercontent.com/glemiu6/komit/main/install.sh", "|", "sh"], check=True,shell=True)
+                result = subprocess.run(
+                    ["curl", "-fsSL", "https://raw.githubusercontent.com/glemiu6/komit/master/scripts/install.sh"],
+                    capture_output=True, check=True
+                )
+                subprocess.run(["bash"], input=result.stdout, check=True)
             case _:
                 print("Could not detect installation method.")
                 print("Please update manually.")
