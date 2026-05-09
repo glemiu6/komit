@@ -8,13 +8,18 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
-Nothing yet
+### Fixed
+- `generator.py` now returns message without ``
+- `README.md` updated with the latest changes
 
+### Added
+
+- Fallback for installation / updates from PyPI 
 ---
 
 ## [0.2.10] - 2026-05-07
 
-### Fix
+### Fixed
 
 - `git_utils.py` uses encoding `utf-8`
 - Timeout handling for LLM calls
@@ -29,7 +34,7 @@ Nothing yet
 - `generator/model_exist` - checks if the model exists locally
 - `generator/check_ollama_running` - checks ollama running
 
-### Fix
+### Fixed
 - `workflow/release.yaml` - added `requests` dependencies
 
 

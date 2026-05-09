@@ -6,13 +6,9 @@ import importlib.metadata
 
 def check_for_updates():
     try:
-        import httpx
+
         from komit import __version__
-        response= httpx.get(
-            "https://api.github.com/repos/glemiu6/komit/releases/latest",
-            timeout=2
-        )
-        latest= response.json()["tag_name"].lstrip("v")
+        latest = _get_latest_version()
         if latest != __version__:
             print(f"!!  New version available: v{latest} (you have v{__version__})")
             print(f"    Use: komit update\n")
@@ -20,7 +16,7 @@ def check_for_updates():
         pass
 
 def uninstall()->None:
-    """Remove komit completely = pip, binary, git aliar and config."""
+    """Remove komit completely = pip, binary, git alias and config."""
     import shutil
     import os
     print("Uninstalling komit...")
@@ -81,17 +77,34 @@ def _detect_install_method() -> str:
     # 3. fallback
     return "binary"
 
-def update():
-    """Update the komit using CLI commands"""
-    try:
-        import httpx
-        from komit import __version__
 
-        response= httpx.get(
+
+def _get_latest_version() -> str:
+    import httpx
+    # Use GitHub
+    try:
+        response = httpx.get(
             "https://api.github.com/repos/glemiu6/komit/releases/latest",
             timeout=2
         )
-        latest= response.json()["tag_name"].lstrip("v")
+        data = response.json()
+        if "tag_name" in data:
+            return data["tag_name"].lstrip("v")
+    except Exception:
+        pass
+    # Use the PyPI as a backup
+    response= httpx.get(
+        "https://pypi.org/pypi/komit/json",
+        timeout=2
+    )
+    return response.json()["info"]["version"]
+
+
+def update():
+    """Update the komit using CLI commands"""
+    try:
+        from komit import __version__
+        latest =_get_latest_version()
         if latest == __version__:
             print("Already up to date!")
             return
@@ -123,3 +136,6 @@ def update():
     except Exception as e:
         print(f"Failed to update: {e}")
         sys.exit(1)
+
+if __name__ == "__main__":
+    print(_get_latest_version())

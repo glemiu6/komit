@@ -62,7 +62,7 @@ def generate_message(diff:str, config:KomitConfig | None=None):
                                        "content":f"Generate a commit message for this:\n\n{diff}"
                                    }
                                ])
-        return response.message.content.strip()
+        return response.message.content.strip().strip('`').strip()
     except httpx.TimeoutException:
         raise RuntimeError(
             f"Generation timed out after {config.timeout}s.\n"
