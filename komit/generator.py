@@ -1,22 +1,24 @@
 #komit/generator.py
 import requests
 import httpx
+import re
+
 from komit.komitconfig import KomitConfig
 STYLES ={
     "conventional":("Generate a conventional commit message (type: description).\n"
                     "Types: feat, fix, docs, style, refactor, test, chore.\n"
                     "Example: 'feat: add user authentication'\n"
-                    "Just the message, nothing else"),
+                    "Just the commit message as plain text, no markdown, no backticks, no code blocks."),
     "simple":("Generate a short, clear commit message in imperative mood.\n"
               "Example: 'Add user authentication'\n"
-              "Just the message, nothing else"),
+              "Just the commit message as plain text, no markdown, no backticks, no code blocks."),
     "detailed":("Generate a commit message with a short title and bullet points.\n"
                 "Example:\n"
                 "feat: add user authentication\n\n"
                 "- Add login endpoint\n"
                 "- Add JWT token generation\n"
                 "- Add password hashing\n"
-                "Just the message, nothing else"),
+                "Just the commit message as plain text, no markdown, no backticks, no code blocks."),
 }
 def model_exist(url:str,model:str)->bool:
     try:
@@ -43,14 +45,13 @@ def generate_message(diff:str, config:KomitConfig | None=None):
         raise Exception(
             "Ollama is not running. Please start it using `ollama serve` and try again."
         )
+    if not model_exist(config.ollama_url, config.model):
+        raise Exception(f"Model `{config.model}` not found locally.\n"
+                        f"Run: `ollama pull {config.model}`")
     try:
-        from ollama import Client
+        from ollama import Client,ChatResponse
         client = Client(host=config.ollama_url, timeout=httpx.Timeout(config.timeout))
-        if not model_exist(config.ollama_url,config.model):
-            raise Exception(f"Model `{config.model}` not found locally.\n"
-                            f"Run: `ollama pull {config.model}`")
-
-        response = client.chat(model=config.model,
+        response: ChatResponse = client.chat(model=config.model,
                                messages=[
                                    {
                                        "role":'system',

@@ -34,8 +34,7 @@ jobs:
           python-version: "3.13"
 
       - name: Install dependencies
-        # Fix: include ollama so PyInstaller can bundle it
-        run: pip install pyinstaller ollama httpx platformdirs requests
+        run: pip install pyinstaller ollama httpx platformdirs requests re
 
       - name: Build binary
         run: pyinstaller --onefile komit/main.py --name ${{ matrix.name }}
