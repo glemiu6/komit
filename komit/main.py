@@ -151,7 +151,7 @@ def run():
                 try:
 
                     message= generate_message(diff=diff,config=config)
-                    print(f"\n New suggested message: {message}\n")
+                    print(f"\n New suggested message:\n {message}\n")
                 except RuntimeError as e:
                     print(f"Error: {e}")
                     sys.exit(1)
