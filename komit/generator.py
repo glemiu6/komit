@@ -1,7 +1,7 @@
 #komit/generator.py
 import requests
 import httpx
-import re
+
 
 from komit.komitconfig import KomitConfig
 STYLES ={
