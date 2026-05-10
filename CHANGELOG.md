@@ -8,13 +8,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
-### Fixed
-- `generator.py` now returns message without ``
-- `README.md` updated with the latest changes
+- Nothing yet
 
-### Added
-
-- Fallback for installation / updates from PyPI 
 ---
 
 ## [0.3.0] - 2026-05-10
@@ -183,6 +178,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Published to PyPI
 
 [Unreleased]: https://github.com/glemiu6/komit/compare/v0.2.0...HEAD
+[0.3.0]: https://github.com/glemiu6/komit/compare/v0.2.10...v0.3.0
 [0.2.10]: https://github.com/glemiu6/komit/compare/v0.2.9...v0.2.10
 [0.2.9]: https://github.com/glemiu6/komit/compare/v0.2.6...v0.2.9
 [0.2.6]: https://github.com/glemiu6/komit/compare/v0.2.5...v0.2.6
