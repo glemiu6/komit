@@ -25,10 +25,10 @@ Features are grouped by phase, ordered by priority.
 | Ollama running check with friendly error                 | ✅ |
 | Model existence check with pull suggestion               | ✅ |
 | Timeout handling for LLM calls                           | ✅ |
-| PowerShell installer (`install.ps1`) | 📋 |
-| Automatic PATH setup on Windows | 📋 |
-| Windows uninstall support | 📋 |
-| Standardized `komit.exe` install | 📋 |
+| PowerShell installer (`install.ps1`) | ✅ |
+| Automatic PATH setup on Windows | ✅ |
+| Windows uninstall support | ✅ |
+| Standardized `komit.exe` install | ✅ |
 
 
 

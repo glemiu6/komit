@@ -34,6 +34,21 @@ def uninstall()->None:
         shutil.rmtree(config_path)
         print("Removed ~/.config/komit")
 
+    if sys.platform == "win32":
+        windows_path = os.path.join(os.environ.get('LOCALAPPDATA',""),'komit')
+        if os.path.exists(windows_path):
+            shutil.rmtree(windows_path)
+            print(f"Removed {windows_path}")
+        try:
+            import winreg
+            key = winreg.OpenKey(winreg.HKEY_CURRENT_USER,"Environment",0,winreg.KEY_ALL_ACCESS)
+            current_path,_ = winreg.QueryValueEx(key,"Path")
+            new_path = ';'.join(p for p in current_path.split(";") if "komit" not in p)
+            winreg.SetValueEx(key, "Path", 0, winreg.REG_EXPAND_SZ, new_path)
+            winreg.CloseKey(key)
+            print("Removed from PATH")
+        except Exception as e:
+            print(f"Could not remove from PATH: {e}")
     #Remove binary if installed via curl
     all_paths = [
        "~/.local/bin/komit",
@@ -121,17 +136,28 @@ def update():
                 subprocess.run([sys.executable, "-m", "pip", "install", "--upgrade", "komit"], check=True)
             case "binary":
                 print("Detected binary installation, updating...")
-                result = subprocess.run(
-                    ["curl", "-fsSL", "https://raw.githubusercontent.com/glemiu6/komit/master/scripts/install.sh"],
-                    capture_output=True, check=True
-                )
-                subprocess.run(["bash"], input=result.stdout, check=True)
+                if sys.platform == "win32":
+                    subprocess.run([
+                        "powershell", "-Command",
+                        "irm https://raw.githubusercontent.com/glemiu6/komit/master/scripts/install.ps1 | iex"],
+                        check=True)
+                else:
+                    result = subprocess.run(
+                        ["curl", "-fsSL", "https://raw.githubusercontent.com/glemiu6/komit/master/scripts/install.sh"],
+                        capture_output=True, check=True
+                    )
+                    subprocess.run(["bash"], input=result.stdout, check=True)
             case _:
                 print("Could not detect installation method.")
                 print("Please update manually.")
+                print("Linux/MacOS: ")
                 print("     pip install --upgrade komit")
                 print("     or")
                 print("     curl -fsSL https://raw.githubusercontent.com/glemiu6/komit/master/install.sh | sh")
+                print("Windows:")
+                print("     pip install --upgrade komit")
+                print("     or")
+                print(      "irm https://raw.githubusercontent.com/glemiu6/komit/master/scripts/install.ps1 | iex")
         print("Update complete! Restart your terminal to use the latest version.")
     except Exception as e:
         print(f"Failed to update: {e}")

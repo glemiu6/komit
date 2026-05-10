@@ -17,6 +17,19 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Fallback for installation / updates from PyPI 
 ---
 
+## [0.3.0] - 2026-05-10
+
+### Added
+- Windows support: PowerShell installer (`scripts/install.ps1`)
+- Automatic PATH setup on Windows via registry
+- Standardized `komit.exe` install (binary renamed on installation)
+- Windows uninstall support via `komit uninstall`
+- Windows binary update support via `komit update`
+
+### Fixed
+- Commit messages no longer wrapped in backticks or Markdown code block
+- GitHub API rate limit error on `komit update` - added PyPI fallback for version checking
+
 ## [0.2.10] - 2026-05-07
 
 ### Fixed

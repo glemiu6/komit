@@ -38,6 +38,12 @@ detect_platform() {
 
 get_latest_version() {
   LATEST=$(curl -fsSL "https://api.github.com/repos/glemiu6/komit/releases/latest" | grep '"tag_name"' | sed 's/.*"tag_name": *"\([^"]*\)".*/\1/')
+
+  # PyPI fallback
+  if [ -z "$LATEST" ]; then
+    LATEST=$(curl -fsSL "https://pypi.org/pypi/komit/json" | grep -o '"version":"[^"]*"' | head -1 | sed 's/"version":"//;s/"//')
+  fi
+
   if [ -z "$LATEST" ]; then
     echo "Error: could not determine latest version."
     exit 1
@@ -46,7 +52,7 @@ get_latest_version() {
 download_binary() {
   URL="$REPO/releases/download/$LATEST/$BINARY"
   echo "Downloading from $URL..."
-  curl -fsSL "$URL" -o komit
+  curl -L --progress-bar "$URL" -o komit
   chmod +x komit
   if [ ! -d "$INSTALL_DIR" ]; then
     echo "Creating $INSTALL_DIR..."
