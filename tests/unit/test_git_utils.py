@@ -33,7 +33,7 @@ class TestGetStagedDiff:
         get_staged_diff()
         mock_run.assert_called_once_with(
             ['git', 'diff', '--staged'],
-            capture_output=True, text=True,encoding='utf-8'
+            capture_output=True, text=True,encoding='utf-8',errors="replace"
         )
 
     @patch("komit.git_utils.subprocess.run")
