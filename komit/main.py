@@ -3,6 +3,9 @@
 import subprocess
 import sys
 import argparse
+from rich.console import Console
+from rich.panel import Panel
+from rich.text import Text
 from komit.git_utils import get_staged_files,get_staged_diff,is_git_repo,commit,commit_with_editor
 from komit.generator import generate_message,STYLES
 from komit.komitconfig import KomitConfig
@@ -87,6 +90,7 @@ def parse_args(argv=None):
     )
     return parser.parse_args(argv)
 def run():
+    console = Console()
     args = parse_args()
 
     if args.command == 'init':
@@ -100,30 +104,29 @@ def run():
         return
     check_for_updates()
     if not is_git_repo():
-        print("Not a git repository")
+        console.print("Not a git repository",style="yellow")
         sys.exit(1)
     diff = get_staged_diff()
     if not diff:
-        print("No staged changes. Run 'git add' first.")
+        console.print("No staged changes. Run 'git add' first.",style="yellow")
         sys.exit(1)
     files= get_staged_files()
-    print(f"\nStaged files ({len(files)}):")
-    for f in files:
-        print(f"  - {f}")
+    files_text = "\n".join(f" [cyan]•[/cyan] {f}" for f in files)
+    console.print(Panel(files_text,title=f"Staged files ({len(files)})",border_style="blue"))
     config = KomitConfig.from_sources(args)
-    print(f"\nGenerating commit message... (style: {config.style}, model: {config.model})")
+    console.print(f"Model: [cyan]{config.model}[/cyan] · Style: [cyan]{config.style}[/cyan]",style="dim")
     try:
-
-        message= generate_message(diff=diff,config=config)
+        with console.status("Generating commit message...", spinner="dots"):
+            message= generate_message(diff=diff,config=config)
         if not message or not isinstance(message, str):
-            print("Invalid response from generator")
+            console.print("Invalid response from generator")
             sys.exit(1)
     except RuntimeError as e:
-        print(f"Error: {e}")
+        console.print(f"Error: {e}",style="bold red")
         sys.exit(1)
-    print(f"\nSuggested message:\n {message}")
+    console.print(Panel(message,title="Suggested commit message",border_style="green"))
     if args.dry_run:
-        print("Running in dry-run mode, no actual changes will be made.")
+        console.print("Running in dry-run mode, no actual changes will be made.",style='yellow')
         sys.exit(0)
     while True:
         choice= input("\nUse this message? (y/n/e to edit/r to regenerate): ").strip().lower()
@@ -131,32 +134,32 @@ def run():
             case 'y':
                 try:
                     commit(message)
-                    print("Committed!")
+                    console.print("✓ Committed!",style="bold green")
                 except subprocess.CalledProcessError as e:
-                    print(f"Commit failed: {e}")
+                    console.print(f"Commit failed: {e}",style="bold red")
                     sys.exit(1)
                 break
             case 'n':
-                print("Commit cancelled!")
+                console.print("✗ Commit cancelled!",style="red")
                 break
             case 'e':
                 try:
                     commit_with_editor(message)
                 except subprocess.CalledProcessError as e:
-                    print(f"Commit failed: {e}")
+                    console.print(f"Commit failed: {e}",style="bold red")
                     sys.exit(1)
                 break
             case 'r':
-                print("Regenerating...")
-                try:
 
-                    message= generate_message(diff=diff,config=config)
-                    print(f"\n New suggested message:\n {message}\n")
+                try:
+                    with console.status("Regenerating...", spinner='dots'):
+                        message= generate_message(diff=diff,config=config)
+                    console.print(Panel(message,title= "New suggested message:",border_style="green"))
                 except RuntimeError as e:
-                    print(f"Error: {e}")
+                    console.print(f"Error: {e}")
                     sys.exit(1)
             case _:
-                print("Invalid choice. Please enter y, n, e, or r.")
+                console.print("Invalid choice. Please enter y, n, e, or r.",style="yellow")
 
 
 if __name__ == "__main__":

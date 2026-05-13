@@ -82,7 +82,7 @@ class TestRunOutput:
         """Fix #2: must print 'Staged files' not 'Stage files'."""
         run()
         out = capsys.readouterr().out
-        assert "Staged files (2):" in out
+        assert "Staged files (2)" in out
 
     @patch("komit.main.is_git_repo", return_value=True)
     @patch("komit.main.get_staged_diff", return_value="diff")
@@ -93,7 +93,7 @@ class TestRunOutput:
     def test_each_file_is_listed(self, _in, _commit, _gen, _files, _diff, _repo, capsys):
         run()
         out = capsys.readouterr().out
-        assert "  - file.py" in out
+        assert "file.py" in out
 
     @patch("komit.main.is_git_repo", return_value=True)
     @patch("komit.main.get_staged_diff", return_value="diff")

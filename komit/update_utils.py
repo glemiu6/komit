@@ -2,7 +2,8 @@
 import subprocess
 import sys
 import importlib.metadata
-
+from rich.console import Console
+console = Console()
 
 def check_for_updates():
     try:
@@ -10,8 +11,8 @@ def check_for_updates():
         from komit import __version__
         latest = _get_latest_version()
         if latest != __version__:
-            print(f"!!  New version available: v{latest} (you have v{__version__})")
-            print(f"    Use: komit update\n")
+            console.print(f"\n[bold yellow]!! New version available: v{latest}[/bold yellow] [dim](you have v{__version__})[/dim]")
+            console.print("[dim]   Use: komit update[/dim]\n")
     except Exception:
         pass
 
@@ -19,12 +20,12 @@ def uninstall()->None:
     """Remove komit completely = pip, binary, git alias and config."""
     import shutil
     import os
-    print("Uninstalling komit...")
+    console.print("[bold red]Uninstalling komit...[/bold red]")
     method = _detect_install_method()
     #Remove git alias
     try:
         subprocess.run(['git','config','--global','--unset','alias.ai'],check=False)
-        print("Removed git alias")
+        console.print("[green]Removed git alias[/green]")
     except Exception:
         pass
 
@@ -32,13 +33,13 @@ def uninstall()->None:
     config_path = os.path.expanduser("~/.config/komit")
     if os.path.exists(config_path):
         shutil.rmtree(config_path)
-        print("Removed ~/.config/komit")
+        console.print("[green]Removed ~/.config/komit[/green]")
 
     if sys.platform == "win32":
         windows_path = os.path.join(os.environ.get('LOCALAPPDATA',""),'komit')
         if os.path.exists(windows_path):
             shutil.rmtree(windows_path)
-            print(f"Removed {windows_path}")
+            console.print(f"[green]Removed {windows_path}[/green]")
         try:
             import winreg
             key = winreg.OpenKey(winreg.HKEY_CURRENT_USER,"Environment",0,winreg.KEY_ALL_ACCESS)
@@ -46,9 +47,9 @@ def uninstall()->None:
             new_path = ';'.join(p for p in current_path.split(";") if "komit" not in p)
             winreg.SetValueEx(key, "Path", 0, winreg.REG_EXPAND_SZ, new_path)
             winreg.CloseKey(key)
-            print("Removed from PATH")
+            console.print("[green]Removed from PATH[/green]")
         except Exception as e:
-            print(f"Could not remove from PATH: {e}")
+            console.print(f"[yellow]Could not remove from PATH: {e}[/yellow]")
     #Remove binary if installed via curl
     all_paths = [
        "~/.local/bin/komit",
@@ -61,18 +62,18 @@ def uninstall()->None:
         if os.path.exists(binary):
             try:
                 subprocess.run(['sudo','rm','-f',binary],check=True)
-                print(f"Removed {binary}")
+                console.print(f"[green]Removed {binary}[/green]")
             except subprocess.CalledProcessError:
-                print(f"Failed to remove {binary}: Try : sudo rm {binary}")
+                console.print(f"[yellow]Failed to remove {binary} - try: sudo rm {binary}[/yellow]")
     #remove for pip
     if method=='pip':
         try:
             subprocess.run([sys.executable,'-m','pip','uninstall','komit','-y'],check=False)
-            print("Removed pip package")
+            console.print("[green]Removed pip package[/green]")
         except subprocess.CalledProcessError:
             pass
 
-    print("\nkomit uninstalled. Goodbye!")
+    console.print("\n[bold red]komit uninstalled. Goodbye![/bold red]")
 
 def _detect_install_method() -> str:
     import sys
@@ -121,21 +122,22 @@ def update():
         from komit import __version__
         latest =_get_latest_version()
         if latest == __version__:
-            print("Already up to date!")
+            console.print("[bold green]Already up to date![/bold green]")
             return
-        print(f"Updating komit: v{__version__} -> v{latest}")
+        console.print(f"\n[bold yellow]!! New version available: v{latest}[/bold yellow] [dim](you have v{__version__})[/dim]")
+        console.print("[dim]   Use: komit update[/dim]\n")
         method = _detect_install_method()
         match method:
             case "pip":
-                print("Detected pip installation, updating...")
+                console.print("Detected pip installation, updating...")
                 try:
                     import pip
                 except ImportError:
-                    print("pip not found, installing...")
+                    console.print("pip not found, installing...")
                     subprocess.run([sys.executable, "-m", "ensurepip", "--upgrade"], check=True)
                 subprocess.run([sys.executable, "-m", "pip", "install", "--upgrade", "komit"], check=True)
             case "binary":
-                print("Detected binary installation, updating...")
+                console.print("Detected binary installation, updating...")
                 if sys.platform == "win32":
                     subprocess.run([
                         "powershell", "-Command",
@@ -148,19 +150,13 @@ def update():
                     )
                     subprocess.run(["bash"], input=result.stdout, check=True)
             case _:
-                print("Could not detect installation method.")
-                print("Please update manually.")
-                print("Linux/MacOS: ")
-                print("     pip install --upgrade komit")
-                print("     or")
-                print("     curl -fsSL https://raw.githubusercontent.com/glemiu6/komit/master/install.sh | sh")
-                print("Windows:")
-                print("     pip install --upgrade komit")
-                print("     or")
-                print(      "irm https://raw.githubusercontent.com/glemiu6/komit/master/scripts/install.ps1 | iex")
-        print("Update complete! Restart your terminal to use the latest version.")
+                console.print("[yellow]Could not detect installation method. Please update manually:[/yellow]")
+                console.print("  [cyan]pip install --upgrade komit[/cyan]")
+                console.print("  [cyan]curl -fsSL https://raw.githubusercontent.com/glemiu6/komit/master/scripts/install.sh | sh[/cyan]")
+                console.print("  [cyan]irm https://raw.githubusercontent.com/glemiu6/komit/master/scripts/install.ps1 | iex[/cyan]")
+        console.print("[bold green]Update complete! Restart your terminal to use the latest version.[/bold green]")
     except Exception as e:
-        print(f"Failed to update: {e}")
+        console.print(f"[bold red]Failed to update: {e}[/bold red]")
         sys.exit(1)
 
 if __name__ == "__main__":

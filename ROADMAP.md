@@ -39,9 +39,9 @@ Features are grouped by phase, ordered by priority.
 
 | Feature | Status |
 |---------|--------|
-| Colored output using Rich | 📋 |
-| Spinner while generating | 📋 |
-| Clean output sections (files / generate / result) | 📋 |
+| Colored output using Rich | ✅ |
+| Spinner while generating | ✅ |
+| Clean output sections (files / generate / result) | ✅ |
 | Better `--help` with usage examples | 📋 |
 | Improved interactive prompt wording | 📋 |
 
@@ -102,7 +102,7 @@ Features are grouped by phase, ordered by priority.
 | Feature | Status |
 |---------|--------|
 | `CHANGELOG.md` (Keep a Changelog format) | ✅ |
-| `CONTRIBUTING.md` | 📋 |
+| `CONTRIBUTING.md` | ✅ |
 | GitHub issue templates (bug + feature request) | 📋 |
 | Auto changelog with git-cliff | 📋 |
 
@@ -115,9 +115,9 @@ Features are grouped by phase, ordered by priority.
 |---------|-------|
 | Homebrew formula (`brew install komit`) | 📋 |
 | Shell completion (`komit --<TAB>`) | 📋 |
-| `komit update` self-update command | 📋 |
+| `komit update` self-update command | ✅ |
 | Dependabot for dependency updates | 📋 |
-| Update scripts via curl/irm (Linux, macOS, Windows) | 📋 |
+| Update scripts via curl/irm (Linux, macOS, Windows) | ✅ |
 | Linux ARM64 binary support (`komit-linux-arm64`) | 📋 |
 
 ---

@@ -8,9 +8,20 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
-- Nothing yet
+- nothing yet
 
 ---
+## [0.3.2] - 2026-05-13
+
+### Added
+- Rich colored output throughout CLI (update, uninstall, commit flow)
+- Spinner while generating commit message
+- Staged files displayed in a panel
+- Suggested commit message displayed in a panel
+
+### Fixed
+- UnicodeDecodeError on macOS when diff contains non-UTF-8 bytes
+
 
 ## [0.3.0] - 2026-05-10
 
@@ -178,6 +189,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Published to PyPI
 
 [Unreleased]: https://github.com/glemiu6/komit/compare/v0.2.0...HEAD
+[0.3.2]: https://github.com/glemiu6/komit/compare/v0.3.0...v0.3.2
 [0.3.0]: https://github.com/glemiu6/komit/compare/v0.2.10...v0.3.0
 [0.2.10]: https://github.com/glemiu6/komit/compare/v0.2.9...v0.2.10
 [0.2.9]: https://github.com/glemiu6/komit/compare/v0.2.6...v0.2.9
