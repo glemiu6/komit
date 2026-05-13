@@ -38,10 +38,10 @@ detect_platform() {
 
 get_latest_version() {
   LATEST=$(curl -fsSL "https://api.github.com/repos/glemiu6/komit/releases/latest" | grep '"tag_name"' | sed 's/.*"tag_name": *"\([^"]*\)".*/\1/')
-
   # PyPI fallback
   if [ -z "$LATEST" ]; then
     LATEST=$(curl -fsSL "https://pypi.org/pypi/komit/json" | grep -o '"version":"[^"]*"' | head -1 | sed 's/"version":"//;s/"//')
+    LATEST="v$LATEST"
   fi
 
   if [ -z "$LATEST" ]; then
@@ -53,6 +53,10 @@ download_binary() {
   URL="$REPO/releases/download/$LATEST/$BINARY"
   echo "Downloading from $URL..."
   curl -L --progress-bar "$URL" -o komit
+  if [ $? -ne 0 ] || [ ! -s komit ]; then
+    rm -f komit
+    exit 1
+  fi
   chmod +x komit
   if [ ! -d "$INSTALL_DIR" ]; then
     echo "Creating $INSTALL_DIR..."
