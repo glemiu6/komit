@@ -249,7 +249,7 @@ class TestRunChoiceInvalid:
         """Fix #6: unknown input must print a message and loop, not silently continue."""
         run()
         out = capsys.readouterr().out
-        assert "Invalid choice" in out
+        assert "Please select one of the available options" in out
         mock_commit.assert_called_once()
 
     @patch("komit.main.is_git_repo", return_value=True)
