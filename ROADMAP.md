@@ -42,8 +42,8 @@ Features are grouped by phase, ordered by priority.
 | Colored output using Rich | ✅ |
 | Spinner while generating | ✅ |
 | Clean output sections (files / generate / result) | ✅ |
-| Better `--help` with usage examples | 📋 |
-| Improved interactive prompt wording | 📋 |
+| Better `--help` with usage examples | ✅ |
+| Improved interactive prompt wording | ✅ |
 
 ---
 

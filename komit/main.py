@@ -5,88 +5,107 @@ import sys
 import argparse
 from rich.console import Console
 from rich.panel import Panel
-from rich.text import Text
+from rich.prompt import Prompt
+
 from komit.git_utils import get_staged_files,get_staged_diff,is_git_repo,commit,commit_with_editor
 from komit.generator import generate_message,STYLES
 from komit.komitconfig import KomitConfig
-from komit.update_utils import check_for_updates,update,uninstall
+from komit.update_utils import check_for_updates, update, uninstall, console
 from komit import __version__
 from komit.config_utils import init_config
 
 def parse_args(argv=None):
     parser = argparse.ArgumentParser(
         prog="komit",
-        description="AI-powered git commit message generator using local LLMs via Ollama."
+        description="AI-powered git commit message generator using local LLMs via Ollama.",
+        formatter_class=argparse.RawTextHelpFormatter,
+        epilog="""
+        Examples:
+        $ komit --style conventional --dry-run
+        $ komit --model llama3
+        $ komit init
+        """
     )
 
+    config_group = parser.add_argument_group("Configuration & LLM Options")
+
     #add flag for style
-    parser.add_argument(
-        '-s',
-        '--style',
+    config_group.add_argument(
+        '-s','--style',
         choices=list(STYLES.keys()),
         default=None,
+        metavar="<type>",
         help="Choose the style of the commit message (default: conventional)."
     )
     #add flag for model
-    parser.add_argument(
-        '-m',
-        '--model',
+    config_group.add_argument(
+        '-m','--model',
         default=None,
+        metavar="<name>",
         help="Choose the model (default: qwen2.5:7b)."
     )
     #add flag for url
-    parser.add_argument(
-        '--ollama-url',
-        '-u',
+    config_group.add_argument(
+        '--ollama-url','-u',
         default=None,
+        metavar="<url>",
         help="Choose the URL of the Ollama (default: http://localhost:11434)."
     )
     #add flag for max difference length
-    parser.add_argument(
+    config_group.add_argument(
         '--max_diff',
         default=None,
         type=int,
+        metavar="<len>",
         help="Choose the maximum diff length (default: 4000)."
     )
+    # flag for passing config file (if not , use default values)
+    config_group.add_argument(
+        '--config',
+        type=str,
+        metavar="<path>",
+        help="Path to custom configuration TOML file"
+    )
+    # flag for timeout in LLM
+    config_group.add_argument(
+        '--timeout',
+        type=int,
+        default=None,
+        metavar="<sec>",
+        help='LLM request timeout in seconds (default: 60)'
+    )
+
+    execution_group = parser.add_argument_group("Execution Options")
 
     #add flag for version
-    parser.add_argument('--version',action='version',
+    execution_group.add_argument('--version',action='version',
                         version=f"{__version__}",
                         help="Version of the package")
     #flag to test the commits without executing
-    parser.add_argument(
-        '--dry-run',
-        '-dr',
+    execution_group.add_argument(
+        '--dry-run','-dr',
         action='store_true',
         help="Don't actually commit the changes."
     )
-    #flag for passing config file (if not , use default values)
-    parser.add_argument(
-        '--config',
-        type=str,
-        help="Path to custom config file"
-    )
-    # flag for timeout in LLM
-    parser.add_argument(
-        '--timeout',
-        type = int,
-        default = None,
-        help='LLM request timeout in seconds (default: 60)'
-    )
     #subparser for action commands
-    subparser = parser.add_subparsers(dest='command')
+    subparser = parser.add_subparsers(
+        title="Available Maintenance Commands",
+        description="Run utility routines instead of generating a commit message.",
+        dest='command',
+        metavar="<command>"
+    )
     # flag from the action komit init
     subparser.add_parser(
         'init',
-        help="Create a config file"
+        help="Create a fresh base configuration file."
     )
     subparser.add_parser(
         'update',
-        help="Update komit to the latest version"
+        help="Pull down the latest version updates."
     )
     subparser.add_parser(
         'uninstall',
-        help="Uninstall komit"
+        help="Safely remove komit from your system."
     )
     return parser.parse_args(argv)
 def run():
@@ -129,7 +148,13 @@ def run():
         console.print("Running in dry-run mode, no actual changes will be made.",style='yellow')
         sys.exit(0)
     while True:
-        choice= input("\nUse this message? (y/n/e to edit/r to regenerate): ").strip().lower()
+
+        choice= Prompt.ask(
+            "\n[bold cyan]»[/bold cyan] Choose an action: ([green]y[/green])es, ([red]n[/red])o, ([yellow]e[/yellow])dit, ([magenta]r[/magenta])egenerate",
+            choices=["y","n","e","r"],
+            show_choices=False,
+            default="y"
+        )
         match choice :
             case 'y':
                 try:
@@ -145,10 +170,10 @@ def run():
             case 'e':
                 try:
                     commit_with_editor(message)
+                    break
                 except subprocess.CalledProcessError as e:
                     console.print(f"Commit failed: {e}",style="bold red")
                     sys.exit(1)
-                break
             case 'r':
 
                 try:
@@ -158,8 +183,6 @@ def run():
                 except RuntimeError as e:
                     console.print(f"Error: {e}")
                     sys.exit(1)
-            case _:
-                console.print("Invalid choice. Please enter y, n, e, or r.",style="yellow")
 
 
 if __name__ == "__main__":

@@ -94,7 +94,7 @@ class TestStylePromptSelection:
         config = KomitConfig(style="conventional")
         generate_message("diff", config)
         system_content = mock_client_cls.return_value.chat.call_args.kwargs["messages"][0]["content"]
-        assert system_content == STYLES["conventional"]
+        assert STYLES["conventional"] in system_content
 
     @patch("komit.generator.model_exist", return_value=True)
     @patch("komit.generator.check_ollama_running", return_value=True)
@@ -106,7 +106,7 @@ class TestStylePromptSelection:
         config = KomitConfig(style="simple")
         generate_message("diff", config)
         system_content = mock_client_cls.return_value.chat.call_args.kwargs["messages"][0]["content"]
-        assert system_content == STYLES["simple"]
+        assert  STYLES["simple"] in system_content
 
     @patch("komit.generator.model_exist", return_value=True)
     @patch("komit.generator.check_ollama_running", return_value=True)
@@ -118,7 +118,7 @@ class TestStylePromptSelection:
         config = KomitConfig(style="detailed")
         generate_message("diff", config)
         system_content = mock_client_cls.return_value.chat.call_args.kwargs["messages"][0]["content"]
-        assert system_content == STYLES["detailed"]
+        assert  STYLES["detailed"] in system_content
 
     @patch("komit.generator.model_exist", return_value=True)
     @patch("komit.generator.check_ollama_running", return_value=True)
@@ -131,7 +131,7 @@ class TestStylePromptSelection:
         config = KomitConfig(style="nonexistent_style")
         generate_message("diff", config)
         system_content = mock_client_cls.return_value.chat.call_args.kwargs["messages"][0]["content"]
-        assert system_content == STYLES["conventional"]
+        assert STYLES["conventional"] in system_content
         assert system_content != "conventional"
 
 

@@ -8,7 +8,10 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
-- nothing yet
+### Fixed
+
+- `komit --help` flag - improved structure
+- Improved interactive prompt wording for the LLM
 
 ---
 ## [0.3.2] - 2026-05-13

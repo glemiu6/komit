@@ -20,6 +20,18 @@ STYLES ={
                 "- Add password hashing\n"
                 "Just the commit message as plain text, no markdown, no backticks, no code blocks."),
 }
+
+SYSTEM_PROMPT_TEMPLATE = """\
+You are an expert git assistant. Your sole task is to review a code diff adn write a clean, production-ready git commit message.
+
+CRITICAL INSTRUCTIONS:
+1. Follow this specific formatting style:
+{style_rules} 
+
+2. Output ONLY the raw commit message text.
+3. Absolutely NO markdown formatting, NO backticks (```), NO code blocks, and NO conversational text or explanations (e.g., do not say 'Here is your commit message:').
+
+"""
 def model_exist(url:str,model:str)->bool:
     try:
         r = requests.get(f"{url}/api/tags",timeout=5)
@@ -40,7 +52,9 @@ def generate_message(diff:str, config:KomitConfig | None=None):
     #truncate large diff
     if len(diff)>config.max_diff_length:
         diff = diff[:config.max_diff_length]+"\n... (truncated)"
-    style_prompt = STYLES.get(config.style,STYLES["conventional"])
+    style_rules = STYLES.get(config.style,STYLES["conventional"])
+
+    system_prompt = SYSTEM_PROMPT_TEMPLATE.format(style_rules=style_rules)
     if not check_ollama_running(config.ollama_url):
         raise Exception(
             "Ollama is not running. Please start it using `ollama serve` and try again."
@@ -55,11 +69,11 @@ def generate_message(diff:str, config:KomitConfig | None=None):
                                messages=[
                                    {
                                        "role":'system',
-                                       "content":style_prompt
+                                       "content":system_prompt
                                    },
                                    {
                                        "role":'user',
-                                       "content":f"Generate a commit message for this:\n\n{diff}"
+                                       "content":f"Revies this git diff and generate the commit message:\n\n{diff}"
                                    }
                                ])
         return response.message.content.strip().strip('`').strip()
