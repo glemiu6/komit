@@ -7,10 +7,10 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.prompt import Prompt
 
-from komit.git_utils import get_staged_files,get_staged_diff,is_git_repo,commit,commit_with_editor
+from komit.git_utils import get_staged_files,get_staged_diff,is_git_repo,commit,commit_with_editor,get_current_branch
 from komit.generator import generate_message,STYLES
 from komit.komitconfig import KomitConfig
-from komit.update_utils import check_for_updates, update, uninstall, console
+from komit.update_utils import check_for_updates, update, uninstall
 from komit import __version__
 from komit.config_utils import init_config
 
@@ -74,6 +74,15 @@ def parse_args(argv=None):
         metavar="<sec>",
         help='LLM request timeout in seconds (default: 60)'
     )
+    #flag for branch detection
+    config_group.add_argument(
+        '--include_branch_name',
+        '-ib',
+        type=bool,
+        default=False,
+        metavar="<bool>",
+        help='Branch detection (default: False)'
+    )
 
     execution_group = parser.add_argument_group("Execution Options")
 
@@ -133,10 +142,12 @@ def run():
     files_text = "\n".join(f" [cyan]•[/cyan] {f}" for f in files)
     console.print(Panel(files_text,title=f"Staged files ({len(files)})",border_style="blue"))
     config = KomitConfig.from_sources(args)
+    branch_name = get_current_branch() if args.include_branch_name else ""
+    console.print(f"Branch name: [blue]{branch_name}[/blue]",style="dim")
     console.print(f"Model: [cyan]{config.model}[/cyan] · Style: [cyan]{config.style}[/cyan]",style="dim")
     try:
         with console.status("Generating commit message...", spinner="dots"):
-            message= generate_message(diff=diff,config=config)
+            message= generate_message(diff=diff,config=config,branch_info=branch_name)
         if not message or not isinstance(message, str):
             console.print("Invalid response from generator")
             sys.exit(1)
@@ -178,7 +189,7 @@ def run():
 
                 try:
                     with console.status("Regenerating...", spinner='dots'):
-                        message= generate_message(diff=diff,config=config)
+                        message= generate_message(diff=diff,config=config,branch_info=branch_name)
                     console.print(Panel(message,title= "New suggested message:",border_style="green"))
                 except RuntimeError as e:
                     console.print(f"Error: {e}")

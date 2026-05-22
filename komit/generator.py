@@ -4,33 +4,43 @@ import httpx
 
 
 from komit.komitconfig import KomitConfig
-STYLES ={
-    "conventional":("Generate a conventional commit message (type: description).\n"
-                    "Types: feat, fix, docs, style, refactor, test, chore.\n"
-                    "Example: 'feat: add user authentication'\n"
-                    "Just the commit message as plain text, no markdown, no backticks, no code blocks."),
-    "simple":("Generate a short, clear commit message in imperative mood.\n"
-              "Example: 'Add user authentication'\n"
-              "Just the commit message as plain text, no markdown, no backticks, no code blocks."),
-    "detailed":("Generate a commit message with a short title and bullet points.\n"
-                "Example:\n"
-                "feat: add user authentication\n\n"
-                "- Add login endpoint\n"
-                "- Add JWT token generation\n"
-                "- Add password hashing\n"
-                "Just the commit message as plain text, no markdown, no backticks, no code blocks."),
+STYLES = {
+    "conventional": (
+        "Generate a conventional commit message (type: description).\n"
+        "Types: feat, fix, docs, style, refactor, test, chore.\n"
+        "Format with branch: 'type: description [branch-name]'\n"
+        "Example: 'feat: add user authentication [feature/login]'\n"
+        "Just the commit message as plain text, no markdown, no backticks, no code blocks."
+    ),
+    "simple": (
+        "Generate a short, clear commit message in imperative mood.\n"
+        "Format with branch: 'Description [branch-name]'\n"
+        "Example: 'Add user authentication [feature/login]'\n"
+        "Just the commit message as plain text, no markdown, no backticks, no code blocks."
+    ),
+    "detailed": (
+        "Generate a commit message with a short title and bullet points.\n"
+        "Format with branch: Append the branch name inside brackets to the title line.\n"
+        "Example:\n"
+        "feat: add user authentication [feature/login]\n\n"
+        "- Add login endpoint\n"
+        "- Add JWT token generation\n"
+        "Just the commit message as plain text, no markdown, no backticks, no code blocks."
+    ),
 }
 
 SYSTEM_PROMPT_TEMPLATE = """\
-You are an expert git assistant. Your sole task is to review a code diff adn write a clean, production-ready git commit message.
+You are an expert git assistant. Your sole task is to review a code diff and write a clean, production-ready git commit message.
 
 CRITICAL INSTRUCTIONS:
 1. Follow this specific formatting style:
-{style_rules} 
+{style_rules}
 
-2. Output ONLY the raw commit message text.
-3. Absolutely NO markdown formatting, NO backticks (```), NO code blocks, and NO conversational text or explanations (e.g., do not say 'Here is your commit message:').
+2. MANDATORY RULE: You MUST append the current git branch name wrapped in square brackets (e.g., [branch-name]) to the main message title as shown in the examples.
+{branch_context}
 
+3. Output ONLY the raw commit message text.
+4. Absolutely NO markdown formatting, NO backticks (```), NO code blocks, and NO conversational text or explanations.
 """
 def model_exist(url:str,model:str)->bool:
     try:
@@ -46,15 +56,16 @@ def check_ollama_running(url:str)->bool:
         return r.status_code == 200
     except requests.exceptions.RequestException:
         return False
-def generate_message(diff:str, config:KomitConfig | None=None):
+def generate_message(diff:str, config:KomitConfig | None=None,branch_info:str=""):
     config = config or KomitConfig()
 
     #truncate large diff
     if len(diff)>config.max_diff_length:
         diff = diff[:config.max_diff_length]+"\n... (truncated)"
     style_rules = STYLES.get(config.style,STYLES["conventional"])
-
-    system_prompt = SYSTEM_PROMPT_TEMPLATE.format(style_rules=style_rules)
+    active_branch = branch_info.strip() if branch_info and branch_info.strip() else ""
+    branch_context = f"CURRENT GIT BRANCH: Use exactly '[{active_branch}]' for your brackets suffix."
+    system_prompt = SYSTEM_PROMPT_TEMPLATE.format(style_rules=style_rules,branch_context=branch_context)
     if not check_ollama_running(config.ollama_url):
         raise Exception(
             "Ollama is not running. Please start it using `ollama serve` and try again."

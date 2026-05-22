@@ -21,6 +21,15 @@ def commit_with_editor(message:str):
         text=True
         ,encoding='utf-8'
     )
+def get_current_branch():
+    result = subprocess.run(
+        ['git', 'rev-parse', '--abbrev-ref', 'HEAD'],
+        check=True,
+        text=True,
+        encoding='utf-8',
+        capture_output=True
+    )
+    return result.stdout.strip()
 
 def is_git_repo():
     result = subprocess.run(['git','rev-parse','--is-inside-work-tree'],capture_output=True,text=True,encoding='utf-8')
