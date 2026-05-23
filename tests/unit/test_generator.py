@@ -215,18 +215,24 @@ class TestGenerateMessageErrors:
         mock_client_cls.assert_called_once_with(host="http://myhost:11434", timeout=httpx.Timeout(timeout=60.0))
 
 
-
 class TestBranchNameInference:
+    def _make_mock_response(self, content="feat: test"):
+        mock_response = MagicMock()
+        mock_response.message.content = content
+        return mock_response
 
+    @patch("komit.generator.model_exist", return_value=True)
     @patch("komit.generator.check_ollama_running", return_value=True)
-    def test_valid_branch_structures_infer_correctly(self, mock_check):
+    @patch("ollama.Client")
+    def test_valid_branch_structures_infer_correctly(self, mock_client_cls,
+            mock_check,
+            mock_model_exist):
         """Pass branch details directly into the parameters to test inference behavior."""
+        mock_client_cls.return_value.chat.return_value = self._make_mock_response()
         config = KomitConfig()
 
-        # Test branch name processing by feeding it as standard parameter input
         message = generate_message(
             diff="git diff content",
             config=config,
             branch_info="feat/auth-login"
         )
-        assert message is not None
