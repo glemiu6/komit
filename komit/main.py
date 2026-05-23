@@ -142,7 +142,7 @@ def run():
     files_text = "\n".join(f" [cyan]•[/cyan] {f}" for f in files)
     console.print(Panel(files_text,title=f"Staged files ({len(files)})",border_style="blue"))
     config = KomitConfig.from_sources(args)
-    branch_name = get_current_branch() if args.include_branch_name else ""
+    branch_name = get_current_branch() if config.include_branch_name else ""
     console.print(f"Branch name: [blue]{branch_name}[/blue]",style="dim")
     console.print(f"Model: [cyan]{config.model}[/cyan] · Style: [cyan]{config.style}[/cyan]",style="dim")
     try:
