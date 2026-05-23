@@ -52,8 +52,8 @@ Features are grouped by phase, ordered by priority.
 
 | Feature | Status |
 |---------|--------|
-| Branch detection (`git rev-parse`) | 📋 |
-| Branch name parsing → infer type + scope | 📋 |
+| Branch detection (`git rev-parse`) | ✅ |
+| Branch name parsing → infer type + scope | ✅ |
 | Structured prompt (branch + files + diff + conventions) | 📋 |
 | Commit history context (last 2–3 commits in prompt) | 📋 |
 | `--explain` flag (summarize changes without committing) | 📋 |

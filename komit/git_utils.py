@@ -1,5 +1,6 @@
 #komit/git_utils.py
 import subprocess
+import re
 
 def get_staged_diff() -> str:
     result = subprocess.run(['git', 'diff', '--staged'], capture_output=True,text=True,encoding='utf-8',errors="replace")
@@ -34,3 +35,18 @@ def get_current_branch():
 def is_git_repo():
     result = subprocess.run(['git','rev-parse','--is-inside-work-tree'],capture_output=True,text=True,encoding='utf-8')
     return result.returncode == 0
+
+def parse_branch_name(branch_name:str)->dict:
+    if not branch_name:
+        return {"type":None,"scope":None}
+
+    branch_name = branch_name.strip().lower()
+
+    match =re.match(r"^([a-z]+)[\/\-]([a-z0-9\-_]+)",branch_name)
+    if match:
+        inferred_type = match.group(1)
+        inferred_scope =match.group(2)
+        valid_types = ["feat","fix","chore","docs","style","refactor","test","ci","perf"]
+        if inferred_type in valid_types:
+            return {"type":inferred_type,"scope":inferred_scope}
+    return {"type":None,"scope":None}

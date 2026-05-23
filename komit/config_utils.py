@@ -18,11 +18,15 @@ def init_config():
     model = input("Model [qwen2.5:7b]: ") or "qwen2.5:7b"
     style = input("Style [conventional/simple/detailed]: ") or "conventional"
     url = input("URL [http://localhost:11434]: ") or "http://localhost:11434"
+    max_diff = input("Max diff length [4000]: ") or 4000
+    timeout = input("Timeout [60]: ") or 60
+    include_branch_name = input("Include branch name [True/False]: ") or True
     content = f"""model = "{model}"
 style = "{style}"
 ollama_url = "{url}"
-max_diff_length = 4000
-timeout = 60
+max_diff_length = "{max_diff}"
+timeout = {timeout}
+include_branch_name = {include_branch_name}
 """
     with open(paths,'w') as f:
         f.write(content.strip())

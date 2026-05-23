@@ -15,9 +15,10 @@ AI-powered git commit message generator using local LLMs via Ollama. No API keys
 ## Features
 
 - 🧠 **Local LLM** — uses Ollama, no API keys needed
+- 🌿 **Branch-Aware Context** — Infers conventional types and scopes directly from your active git branch
 - 📝 **Multiple commit styles** — conventional, simple, detailed
 - 🔄 **Regenerate** — not happy? generate a new message instantly
-- ✏️ **Edit before commit** — open your editor to tweak the message
+- ✏️ **Edit before commit** — open your editor to tweak the message safely (`git commit -m ... -e`)
 - ⚙️ **CLI flags** — control style, model, and more from the command line
 - 📁 **Config file** — persist your preferences with `komit init`
 - 🌍 **Universal** — works via pip, binary, or shell script
@@ -25,7 +26,6 @@ AI-powered git commit message generator using local LLMs via Ollama. No API keys
 - ⚡ **Fast** — runs on your machine, no network calls to external APIs
 - 🔒 **Ollama validation** — checks if Ollama is running and model exists before generating
 - 🔁 **Smart updates** — detects pip vs binary install and updates accordingly
-
 
 ---
 
@@ -46,6 +46,7 @@ AI-powered git commit message generator using local LLMs via Ollama. No API keys
 
 ```bash
 ollama pull qwen2.5:7b
+
 ```
 
 ---
@@ -78,10 +79,10 @@ pipx install komit
 
 ### Option 5 — Download binary
 
-Download the binary for your platform from [GitHub Releases](https://github.com/glemiu6/komit/releases/latest):
+Download the binary for your platform from [GitHub Releases](https://www.google.com/search?q=https://github.com/glemiu6/komit/releases/latest):
 
 | Platform | Binary |
-|----------|--------|
+| --- | --- |
 | Linux x86_64 | `komit-linux-x86_64` |
 | macOS Apple Silicon | `komit-macos-arm64` |
 | Windows | `komit-windows-x86_64.exe` |
@@ -136,145 +137,179 @@ git ai
 ./scripts/commit.sh
 ```
 
-### Subcommands
+### Subcommands & Maintenance
+
+Instead of creating a commit message, you can manage the application lifetime using these distinct actions:
 
 ```bash
-komit init       # create config file at ~/.config/komit/config.toml
-komit update     # update to latest version
-komit uninstall  # remove komit
+komit init       # Interactively build or overwrite your global config.toml file
+komit update     # Safely checks for and installs down the latest tracking version
+komit uninstall  # Complete system removal (clears global aliases, configs, variables, and packaging)
+
 ```
 
 ### CLI flags
 
 ```bash
-komit [--style STYLE] [--model MODEL] [--ollama-url URL] [--max-diff N] [--dry-run]
+komit [--style STYLE] [--model MODEL] [--ollama-url URL] [--max_diff N] [--timeout SEC] [--include_branch_name BOOL] [--dry-run]
+
 ```
 
-| Flag | Options | Default | Description |
-|------|---------|---------|-------------|
-| `-s, --style` | `conventional`, `simple`, `detailed` | `conventional` | Commit message style |
-| `-m, --model` | any Ollama model | `qwen2.5:7b` | Model to use |
-| `-u, --ollama-url` | any URL | `http://localhost:11434` | Ollama server URL |
-| `--max-diff` | integer | `4000` | Max diff length sent to model |
-| `--dry-run` | — | `false` | Preview message without committing |
-| `--config` | path | `~/.config/komit/config.toml` | Path to custom config file |
+| Flag | Short | Options / Type | Default | Description |
+| --- | --- | --- | --- | --- |
+| `--style` | `-s` | `conventional`, `simple`, `detailed` | `None` (uses config) | Choose the output template formatting engine |
+| `--model` | `-m` | String (any Ollama model tag) | `None` (uses config) | Target local model signature |
+| `--ollama-url` | `-u` | Valid URL | `None` (uses config) | Set alternative Ollama API endpoint host |
+| `--max_diff` | — | Integer | `None` (uses config) | Maximum diff character truncation length |
+| `--timeout` | — | Integer | `None` (uses config) | Maximum generation time frame allowance in seconds |
+| `--include_branch_name` | `-ib` | `True` / `False` | `None` (uses config) | Enable context mapping and suffixing with current branch name |
+| `--dry-run` | `-dr` | Flag (store_true) | `False` | Halts execution gracefully at preview step without creating a commit |
+| `--config` | — | Path String | `None` | Read execution parameters from a non-standard configuration layout |
 
 ### Examples
 
 ```bash
-# use simple style
+# Force simple formatting mode execution
 komit --style simple
 
-# use a faster model
+# Use smaller parameter scale weights to save resources
 komit --model llama3.2:3b
 
-# detailed style with different model
-komit --style detailed --model mistral:7b
+# Track structural tags across distinct remote targets
+komit --ollama-url [http://192.168.1.10:11434](http://192.168.1.10:11434)
 
-# connect to remote Ollama
-komit --ollama-url http://192.168.1.10:11434
+# Match branch contexts strictly to evaluate output properties
+komit -ib True --dry-run
 
-# preview without committing
-komit --dry-run
-
-# use custom config file
+# Run against explicit local parameters
 komit --config ~/my-config.toml
-```
-
-### Interactive prompt
 
 ```
-Staged files (3):
-  - src/auth.py
-  - tests/test_auth.py
-  - README.md
-
-Generating commit message... (style: conventional, model: qwen2.5:7b)
-
-Suggested message:
-  feat: add JWT authentication with refresh token support
-
-Use this message? (y/n/e to edit/r to regenerate):
-```
-
-| Key | Action |
-|-----|--------|
-| `y` | Commit with the suggested message |
-| `n` | Cancel |
-| `e` | Open editor to modify the message |
-| `r` | Regenerate a new message |
 
 ---
 
-## Config File
+## Interactive Experience
 
-Run `komit init` to create a config file at `~/.config/komit/config.toml`:
+When invoked, `komit` structures your staged workspace and interactive paths using rich terminal layouts:
+
+```text
+┬──────────────────────── Staged files (3) ────────────────────────┬
+│  • src/auth.py                                                   │
+│  • tests/test_auth.py                                            │
+│  • README.md                                                     │
+┴──────────────────────────────────────────────────────────────────┴
+Branch name: feature/auth-tokens
+Model: qwen2.5:7b · Style: conventional
+
+⠋ Generating commit message...
+
+┬──────────────────── Suggested commit message ────────────────────┬
+│ feat(auth): add JWT authentication token engine [feature/auth-t… │
+┴──────────────────────────────────────────────────────────────────┴
+
+» Choose an action: (y)es, (n)o, (e)dit, (r)egenerate [y]: 
+
+```
+
+### Response Path Mappings
+
+| Option | Key | Behavior |
+| --- | --- | --- |
+| **Yes** | `y` | Instantly runs standard non-interactive `git commit -m` mapping directly to the output. |
+| **No** | `n` | Terminates routine execution without impacting staged files. |
+| **Edit** | `e` | Executes `git commit -m ... -e`, loading the generated message straight into your local environment editor ($EDITOR) for explicit manual overrides. |
+| **Regenerate** | `r` | Restrikes the Ollama Chat API endpoint using structural variance to provide a fresh alternative message option. |
+
+---
+
+## Branch Name Parsing (Smart Inference)
+
+When `--include_branch_name` is enabled, `komit` automatically reads your current Git branch name to guess the correct commit type and scope before asking the AI to write the message. 
+
+If your branch follows common naming patterns like `type/scope-description` or `type-scope`, it extracts the details instantly:
+
+*   **`feat/auth-login`** $\rightarrow$ Type: `feat`, Scope: `auth`
+*   **`fix/ui_button`** $\rightarrow$ Type: `fix`, Scope: `ui_button`
+
+### Supported Types
+The parser actively detects these standard conventional commit types: 
+`feat`, `fix`, `chore`, `docs`, `style`, `refactor`, `test`, `ci`, and `perf`.
+
+---
+
+## Configuration Schema
+
+Run `komit init` to automatically provision a configuration folder or overwrite file defaults. The values are securely maintained globally under `~/.config/komit/config.toml` (or your platform configuration equivalent via `platformdirs` standards):
 
 ```toml
 model = "qwen2.5:7b"
 style = "conventional"
 ollama_url = "http://localhost:11434"
 max_diff_length = 4000
+timeout = 60
+include_branch_name = true
+
 ```
 
-CLI flags always override the config file.
+*Note: Runtime arguments passed via your terminal interface explicitly supersede structural rules defined inside your persistent configurations.*
 
 ---
 
-## Commit Styles
+## Commit Style Outputs
 
-### Conventional (default)
+### Conventional (Default Pattern)
 
-```
-feat: add user authentication
-fix: resolve null pointer in login flow
-docs: update API reference
+```text
+feat(auth): add user authentication [feature/login]
+fix(api): resolve null pointer in response pipeline [bugfix/cors]
+
 ```
 
 ### Simple
 
-```
-Add user authentication
-Fix null pointer in login flow
-Update API reference
+```text
+Add user authentication [feature/login]
+Fix null pointer in response pipeline [bugfix/cors]
+
 ```
 
 ### Detailed
 
-```
-feat: add user authentication
+```text
+feat(auth): add user authentication [feature/login]
 
-- Add JWT token generation
-- Add password hashing with bcrypt
-- Add refresh token support
+- Add JWT token generation pipeline
+- Implement password security layers using bcrypt primitives
+- Append rotation verification routes
+
 ```
 
 ---
 
-## Update & Uninstall
+## Maintenance
 
 ```bash
-# update
+# Upgrading tracking states
 komit update
 
-# uninstall
+# Completely remove all system components
 komit uninstall
-```
 
-`komit` automatically detects whether you installed via pip or binary and uses the correct update method.
+```
 
 ---
 
 ## Contributing
 
-1. Fork the repo
-2. Create a feature branch (`git checkout -b feature-name`)
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feat/my-cool-feature`)
 3. Commit your changes (`komit` 😉)
-4. Push to the branch (`git push origin feature-name`)
+4. Push to the branch (`git push origin feat/my-cool-feature`)
 5. Open a Pull Request
 
 ---
 
 ## License
 
-[Apache License 2.0](https://github.com/glemiu6/komit/blob/master/LICENSE)
+[Apache License 2.0]()
+

@@ -79,7 +79,7 @@ def parse_args(argv=None):
         '--include_branch_name',
         '-ib',
         type=bool,
-        default=False,
+        default=None,
         metavar="<bool>",
         help='Branch detection (default: False)'
     )

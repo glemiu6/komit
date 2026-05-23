@@ -1,7 +1,7 @@
 #komit/generator.py
 import requests
 import httpx
-
+from komit.git_utils import parse_branch_name
 
 from komit.komitconfig import KomitConfig
 STYLES = {
@@ -30,13 +30,19 @@ STYLES = {
 }
 
 SYSTEM_PROMPT_TEMPLATE = """\
-You are an expert git assistant. Your sole task is to review a code diff and write a clean, production-ready git commit message.
+You are an expert developer tool that generates Conventional Commit messages based on git diffs.
+
+Strict Output Rules:
+1. Format: <type>: <description>
+2. Do NOT include empty brackets "[]", empty parentheses "()", or trailing whitespace if a scope or branch context is missing.
+3. Example of BAD output: "docs: update README []"
+4. Example of GOOD output: "docs: update README and CHANGELOG with new features"
 
 CRITICAL INSTRUCTIONS:
 1. Follow this specific formatting style:
 {style_rules}
 
-2. MANDATORY RULE: You MUST append the current git branch name wrapped in square brackets (e.g., [branch-name]) to the main message title as shown in the examples.
+2. BRANCH HANDLING RULE: 
 {branch_context}
 
 3. Output ONLY the raw commit message text.
@@ -56,16 +62,29 @@ def check_ollama_running(url:str)->bool:
         return r.status_code == 200
     except requests.exceptions.RequestException:
         return False
+
+
 def generate_message(diff:str, config:KomitConfig | None=None,branch_info:str=""):
     config = config or KomitConfig()
 
     #truncate large diff
     if len(diff)>config.max_diff_length:
         diff = diff[:config.max_diff_length]+"\n... (truncated)"
-    style_rules = STYLES.get(config.style,STYLES["conventional"])
+    style_rules = STYLES.get(config.style, STYLES["conventional"])
     active_branch = branch_info.strip() if branch_info and branch_info.strip() else ""
-    branch_context = f"CURRENT GIT BRANCH: Use exactly '[{active_branch}]' for your brackets suffix."
-    system_prompt = SYSTEM_PROMPT_TEMPLATE.format(style_rules=style_rules,branch_context=branch_context)
+
+    if active_branch and active_branch.lower() != "unreleased":
+        parsed_branch = parse_branch_name(active_branch)
+        branch_context = f"CURRENT GIT BRANCH: {active_branch}\n"
+        if parsed_branch["type"]:
+            branch_context += f"INFERRED COMMIT TYPE: {parsed_branch['type']}\n"
+        if parsed_branch["scope"]:
+            branch_context += f"INFERRED CODESPACE SCOPE: {parsed_branch['scope']}\n"
+        branch_context += f"MANDATORY SUFFIX: Use exactly '[{active_branch}]' at the end of the title line."
+    else:
+        branch_context = "MANDATORY RULE: No branch information is available. Do NOT append any square brackets, placeholders, empty braces '[]', or branch names to the message."
+
+    system_prompt = SYSTEM_PROMPT_TEMPLATE.format(style_rules=style_rules, branch_context=branch_context)
     if not check_ollama_running(config.ollama_url):
         raise Exception(
             "Ollama is not running. Please start it using `ollama serve` and try again."

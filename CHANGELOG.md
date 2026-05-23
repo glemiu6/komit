@@ -8,12 +8,22 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+- None
+
+---
+
+
+## [0.3.5] - 2026-05-23
 ### Fixed
 
 - `komit --help` flag - improved structure
 - Improved interactive prompt wording for the LLM
 
----
+### Added
+- `komit -ib ` - branch detection flag 
+- Branch detection in the interactive prompt
+- Branch name parsing → infer type + scope
+
 ## [0.3.2] - 2026-05-13
 
 ### Added
@@ -192,6 +202,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Published to PyPI
 
 [Unreleased]: https://github.com/glemiu6/komit/compare/v0.2.0...HEAD
+[0.3.5]: https://github.com/glemiu6/komit/compare/v0.3.2...v0.3.5
 [0.3.2]: https://github.com/glemiu6/komit/compare/v0.3.0...v0.3.2
 [0.3.0]: https://github.com/glemiu6/komit/compare/v0.2.10...v0.3.0
 [0.2.10]: https://github.com/glemiu6/komit/compare/v0.2.9...v0.2.10
