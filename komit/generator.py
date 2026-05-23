@@ -1,7 +1,7 @@
 #komit/generator.py
 import requests
 import httpx
-from komit.git_utils import parse_branch_name
+from komit.git_utils import parse_branch_name,get_changed_files
 
 from komit.komitconfig import KomitConfig
 STYLES = {
@@ -67,6 +67,9 @@ def check_ollama_running(url:str)->bool:
 def generate_message(diff:str, config:KomitConfig | None=None,branch_info:str=""):
     config = config or KomitConfig()
 
+    changed_files = get_changed_files()
+    files_context = f"Modified Files:\n{changed_files}\n\n" if changed_files else ""
+
     #truncate large diff
     if len(diff)>config.max_diff_length:
         diff = diff[:config.max_diff_length]+"\n... (truncated)"
@@ -103,7 +106,7 @@ def generate_message(diff:str, config:KomitConfig | None=None,branch_info:str=""
                                    },
                                    {
                                        "role":'user',
-                                       "content":f"Revies this git diff and generate the commit message:\n\n{diff}"
+                                       "content":f"Review this git diff and generate the commit message:\n\n{files_context}Git Diff:\n{diff}"
                                    }
                                ])
         return response.message.content.strip().strip('`').strip()
