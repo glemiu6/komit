@@ -34,26 +34,22 @@ STYLES = {
 SYSTEM_PROMPT_TEMPLATE = """\
 You are an expert developer tool that generates Conventional Commit messages based on git diffs.
 
-Strict Output Rules:
-1. Format: <type>: <description>
-2. Do NOT include empty brackets "[]", empty parentheses "()", or trailing whitespace if a scope or branch context is missing.
-3. Example of BAD output: "docs: update README []"
-4. Example of GOOD output: "docs: update README and CHANGELOG with new features"
-
 CRITICAL INSTRUCTIONS:
-1. Follow this specific formatting style:
+1. Follow this specific formatting style EXACTLY:
 {style_rules}
 
 2. BRANCH HANDLING RULE: 
 {branch_context}
 
 3. FOCUS RULE:
-- Prioritize code changes (*.py, *.js, *.ts, etc.) over documentation changes (*.md, *.txt).
+- Prioritize code changes (*.py, *.js, *.ts) over documentation changes (*.md, *.txt).
 - If both code and docs are changed, the commit type and description must reflect the code changes.
 - Ignore CHANGELOG.md and ROADMAP.md entirely when determining the commit type and message.
 
-4. Output ONLY the raw commit message text.
-5. Absolutely NO markdown formatting, NO backticks (```), NO code blocks, and NO conversational text or explanations.
+4. OUTPUT RULES:
+- Do NOT include empty brackets "[]" or empty parentheses "()".
+- Output ONLY the raw commit message text.
+- NO markdown formatting, NO backticks, NO code blocks, NO explanations.
 """
 
 
