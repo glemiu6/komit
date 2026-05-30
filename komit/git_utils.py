@@ -34,6 +34,16 @@ def get_current_branch():
     )
     return result.stdout.strip()
 
+def get_recent_commits(n:int=3)->str:
+    result = subprocess.run(
+        ['git','log',f'-{n}','--oneline'],
+        check=True,
+        text=True,
+        encoding='utf-8',
+        capture_output=True
+    )
+    return result.stdout.strip()
+
 def is_git_repo():
     result = subprocess.run(['git','rev-parse','--is-inside-work-tree'],capture_output=True,text=True,encoding='utf-8')
     return result.returncode == 0

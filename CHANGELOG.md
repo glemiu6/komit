@@ -12,6 +12,13 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [0.4.0] - 2026-05-30
+
+### Added
+- `komit --explain` - explain the commits
+- Prompt context include the last 3 commits
+
+
 
 ## [0.3.5] - 2026-05-23
 ### Fixed

@@ -78,10 +78,8 @@ def parse_args(argv=None):
     config_group.add_argument(
         '--include_branch_name',
         '-ib',
-        type=bool,
-        default=None,
-        metavar="<bool>",
-        help='Branch detection (default: False)'
+        action="store_true",
+        help='Include branch name in commit message (default: True)'
     )
 
     execution_group = parser.add_argument_group("Execution Options")
@@ -95,6 +93,12 @@ def parse_args(argv=None):
         '--dry-run','-dr',
         action='store_true',
         help="Don't actually commit the changes."
+    )
+    #flag for explaining the changes without commiting
+    execution_group.add_argument(
+        '--explain',
+        action="store_true",
+        help="Explain staged changes without committing."
     )
     #subparser for action commands
     subparser = parser.add_subparsers(
@@ -145,6 +149,12 @@ def run():
     branch_name = get_current_branch() if config.include_branch_name else ""
     console.print(f"Branch name: [blue]{branch_name}[/blue]",style="dim")
     console.print(f"Model: [cyan]{config.model}[/cyan] · Style: [cyan]{config.style}[/cyan]",style="dim")
+    if args.explain:
+        from komit.generator import explain_changes
+        with console.status("Explaining changes...",spinner="dots"):
+            explanation = explain_changes(diff=diff,config=config)
+        console.print(Panel(explanation,title="What changed",border_style="cyan"))
+        sys.exit(0)
     try:
         with console.status("Generating commit message...", spinner="dots"):
             message= generate_message(diff=diff,config=config,branch_info=branch_name)

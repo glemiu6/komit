@@ -1,7 +1,9 @@
 #komit/generator.py
+from http import client
+
 import requests
 import httpx
-from komit.git_utils import parse_branch_name,get_changed_files
+from komit.git_utils import parse_branch_name,get_changed_files,get_recent_commits
 
 from komit.komitconfig import KomitConfig
 STYLES = {
@@ -45,9 +47,16 @@ CRITICAL INSTRUCTIONS:
 2. BRANCH HANDLING RULE: 
 {branch_context}
 
-3. Output ONLY the raw commit message text.
-4. Absolutely NO markdown formatting, NO backticks (```), NO code blocks, and NO conversational text or explanations.
+3. FOCUS RULE:
+- Prioritize code changes (*.py, *.js, *.ts, etc.) over documentation changes (*.md, *.txt).
+- If both code and docs are changed, the commit type and description must reflect the code changes.
+- Ignore CHANGELOG.md and ROADMAP.md entirely when determining the commit type and message.
+
+4. Output ONLY the raw commit message text.
+5. Absolutely NO markdown formatting, NO backticks (```), NO code blocks, and NO conversational text or explanations.
 """
+
+
 def model_exist(url:str,model:str)->bool:
     try:
         r = requests.get(f"{url}/api/tags",timeout=5)
@@ -69,6 +78,9 @@ def generate_message(diff:str, config:KomitConfig | None=None,branch_info:str=""
 
     changed_files = get_changed_files()
     files_context = f"Modified Files:\n{changed_files}\n\n" if changed_files else ""
+
+    recent = get_recent_commits(3)
+    recent_context = f"Recent Commits:\n{recent}\n\n" if recent else ""
 
     #truncate large diff
     if len(diff)>config.max_diff_length:
@@ -106,7 +118,7 @@ def generate_message(diff:str, config:KomitConfig | None=None,branch_info:str=""
                                    },
                                    {
                                        "role":'user',
-                                       "content":f"Review this git diff and generate the commit message:\n\n{files_context}Git Diff:\n{diff}"
+                                       "content":f"Review this git diff and generate the commit message:\n\n{recent_context}{files_context}Git Diff:\n{diff}"
                                    }
                                ])
         return response.message.content.strip().strip('`').strip()
@@ -118,3 +130,39 @@ def generate_message(diff:str, config:KomitConfig | None=None,branch_info:str=""
 
     except Exception as e:
         raise RuntimeError(f"Failed to generate commit message: {e}")
+
+
+def explain_changes(diff:str, config:KomitConfig | None=None)->str:
+    config = config or KomitConfig()
+
+    if len(diff)>config.max_diff_length:
+        diff = diff[:config.max_diff_length] + "\n... (truncated)"
+
+    if not check_ollama_running(config.ollama_url):
+        raise Exception("Ollama is not running. Please start by using `ollama serve`.")
+    if not model_exist(config.ollama_url, config.model):
+        raise Exception(f"Model `{config.model}` not found locally.\nRun `ollama pull {config.model}`")
+
+    try:
+        from ollama import Client
+        client = Client(host=config.ollama_url, timeout=httpx.Timeout(config.timeout))
+        response = client.chat(model=config.model, messages=[
+            {
+                "role":'system',
+                "content":(
+                    "You are a code reviewer. Explain what the following git diff does "
+                    "in plain English only. Use a numbered list, one item per changed file or feature. "
+                    "Be concise, focus on what changed and why it matters. "
+                    "No markdown formatting, no bold text, no asterisks, no backticks, plain text only."
+                )
+            },
+            {
+                "role":'user',
+                "content":f"Explain these changes:\n\n{diff}"
+            }
+        ])
+        return response.message.content.strip().strip('`').strip()
+    except httpx.TimeoutException:
+        raise RuntimeError(f"Timed out after {config.timeout}s.")
+    except Exception as e:
+        raise RuntimeError(f"Failed to explain changes: {e}")
