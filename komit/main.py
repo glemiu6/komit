@@ -78,7 +78,9 @@ def parse_args(argv=None):
     config_group.add_argument(
         '--include_branch_name',
         '-ib',
-        action="store_true",
+        type=bool,
+        default=None,
+        metavar="<bool>",
         help='Include branch name in commit message (default: True)'
     )
 
@@ -99,6 +101,11 @@ def parse_args(argv=None):
         '--explain',
         action="store_true",
         help="Explain staged changes without committing."
+    )
+    execution_group.add_argument(
+        '--deep',
+        action="store_true",
+        help="Summarize each file separately for better commit messages on large diffs (slower)."
     )
     #subparser for action commands
     subparser = parser.add_subparsers(
@@ -156,8 +163,9 @@ def run():
         console.print(Panel(explanation,title="What changed",border_style="cyan"))
         sys.exit(0)
     try:
-        with console.status("Generating commit message...", spinner="dots"):
-            message= generate_message(diff=diff,config=config,branch_info=branch_name)
+        status_msg = "Generating commit message (deep mode)..." if args.deep else "Generate commit message..."
+        with console.status(status_msg, spinner="dots"):
+            message= generate_message(diff=diff,config=config,branch_info=branch_name,deep=args.deep)
         if not message or not isinstance(message, str):
             console.print("Invalid response from generator")
             sys.exit(1)

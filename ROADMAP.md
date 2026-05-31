@@ -65,9 +65,9 @@ Features are grouped by phase, ordered by priority.
 
 | Feature | Status |
 |---------|--------|
-| Split diff by file instead of character count | 📋 |
-| Summarize each file chunk separately | 📋 |
-| Merge chunk summaries into final message | 📋 |
+| Split diff by file instead of character count | ✅ |
+| Summarize each file chunk separately | ✅ |
+| Merge chunk summaries into final message | ✅ |
 | Better truncation messaging | 📋 |
 
 ---

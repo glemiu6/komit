@@ -11,6 +11,19 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - None
 
 ---
+## [0.4.2] - 2026-05-31
+### Added
+- `--deep` flag for per-file diff summarization (slower but more accurate on large changesets)
+- `--explain` flag to summarize staged changes without committing
+- Per-file diff allocation with `split_diff_by_file` and `allocate_diff`
+- Priority-based diff truncation — code files get more context than docs
+
+
+### Fixed
+- CHANGELOG.md and ROADMAP.md ignored when determining commit type
+- Diff truncation now per-file instead of global character count
+
+
 
 ## [0.4.0] - 2026-05-30
 
@@ -208,7 +221,9 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Shell script wrapper (`scripts/commit.sh`)
 - Published to PyPI
 
-[Unreleased]: https://github.com/glemiu6/komit/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/glemiu6/komit/compare/v0.4.2...HEAD
+[0.4.2]: https://github.com/glemiu/komit/compare/v0.4.0...v0.4.2
+[0.4.0]: https://github.com/glemiu/komit/compare/v0.3.5...v0.4.0
 [0.3.5]: https://github.com/glemiu6/komit/compare/v0.3.2...v0.3.5
 [0.3.2]: https://github.com/glemiu6/komit/compare/v0.3.0...v0.3.2
 [0.3.0]: https://github.com/glemiu6/komit/compare/v0.2.10...v0.3.0

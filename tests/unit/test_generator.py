@@ -2,7 +2,7 @@ import httpx
 import pytest
 from unittest.mock import MagicMock, patch
 from komit.komitconfig import KomitConfig
-from komit.generator import generate_message, STYLES
+from komit.generator import generate_message, STYLES,summarize_file_chunk
 
 
 class TestStyles:
@@ -236,3 +236,46 @@ class TestBranchNameInference:
             config=config,
             branch_info="feat/auth-login"
         )
+
+class TestSummarizeFileChunk:
+    def _make_mock_response(self, content="updated authentication logic"):
+        mock_response = MagicMock()
+        mock_response.message.content = content
+        return mock_response
+
+    @patch("komit.generator.model_exist", return_value=True)
+    @patch("komit.generator.check_ollama_running", return_value=True)
+    @patch("ollama.Client")
+    def test_returns_filename_prefixed_summary(self, mock_client_cls, mock_check, mock_model_exist):
+        mock_client_cls.return_value.chat.return_value = self._make_mock_response()
+        config = KomitConfig()
+        result = summarize_file_chunk("auth.py", "diff content", config)
+        assert "auth.py" in result
+
+    @patch("komit.generator.model_exist", return_value=True)
+    @patch("komit.generator.check_ollama_running", return_value=True)
+    @patch("ollama.Client")
+    def test_returns_string(self, mock_client_cls, mock_check, mock_model_exist):
+        mock_client_cls.return_value.chat.return_value = self._make_mock_response()
+        config = KomitConfig()
+        result = summarize_file_chunk("main.py", "diff content", config)
+        assert isinstance(result, str)
+
+    @patch("komit.generator.model_exist", return_value=True)
+    @patch("komit.generator.check_ollama_running", return_value=True)
+    @patch("ollama.Client")
+    def test_uses_correct_model(self, mock_client_cls, mock_check, mock_model_exist):
+        mock_client_cls.return_value.chat.return_value = self._make_mock_response()
+        config = KomitConfig(model="mistral:7b")
+        summarize_file_chunk("file.py", "diff", config)
+        call_kwargs = mock_client_cls.return_value.chat.call_args.kwargs
+        assert call_kwargs["model"] == "mistral:7b"
+
+    @patch("komit.generator.model_exist", return_value=True)
+    @patch("komit.generator.check_ollama_running", return_value=True)
+    @patch("ollama.Client")
+    def test_ollama_exception_raises_runtime_error(self, mock_client_cls, mock_check, mock_model_exist):
+        mock_client_cls.return_value.chat.side_effect = Exception("connection refused")
+        config = KomitConfig()
+        with pytest.raises(Exception):
+            summarize_file_chunk("file.py", "diff", config)

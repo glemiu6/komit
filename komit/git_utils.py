@@ -62,3 +62,37 @@ def parse_branch_name(branch_name:str)->dict:
         if inferred_type in valid_types:
             return {"type":inferred_type,"scope":inferred_scope}
     return {"type":None,"scope":None}
+
+
+def split_diff_by_file(diff:str)->dict[str,str]:
+    chunks = {}
+    parts = diff.split('diff --git ')
+    for part in parts:
+        if not part.strip():
+            continue
+        first_line = part.split('\n')[0]
+        filename = first_line.split(' b/')[-1].strip()
+        chunks[filename] = "diff --git " + part
+    return chunks
+
+def allocate_diff(diff:str,max_length:int)->str:
+    DOC_EXTENSION = {".md",".txt",".rst",".changelog"}
+    import os
+    file_chunk = split_diff_by_file(diff)
+    if not file_chunk:
+        return diff[:max_length] + "\n... (truncated)" if len(diff) > max_length else diff
+
+    process = []
+    for filename,chunk in file_chunk.items():
+        ext= os.path.splitext(filename)[1].lower()
+        if ext in DOC_EXTENSION:
+            limit = 300
+        else:
+            limit = max_length//max(1,len(file_chunk))
+
+
+        if len(chunk)<=limit:
+            process.append(chunk)
+        else:
+            process.append(chunk[:limit] + "\n... (truncated)")
+    return "\n".join(process)

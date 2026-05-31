@@ -155,8 +155,8 @@ komit [--style STYLE] [--model MODEL] [--ollama-url URL] [--max_diff N] [--timeo
 
 ```
 
-| Flag | Short | Options / Type | Default | Description |
-| --- | --- | --- | --- | --- |
+| Flag | Short | Options / Type                       | Default | Description |
+| --- |----|--------------------------------------| - | --- |
 | `--style` | `-s` | `conventional`, `simple`, `detailed` | `None` (uses config) | Choose the output template formatting engine |
 | `--model` | `-m` | String (any Ollama model tag) | `None` (uses config) | Target local model signature |
 | `--ollama-url` | `-u` | Valid URL | `None` (uses config) | Set alternative Ollama API endpoint host |
@@ -165,6 +165,7 @@ komit [--style STYLE] [--model MODEL] [--ollama-url URL] [--max_diff N] [--timeo
 | `--include_branch_name` | `-ib` | `True` / `False` | `None` (uses config) | Enable context mapping and suffixing with current branch name |
 | `--dry-run` | `-dr` | Flag (store_true) | `False` | Halts execution gracefully at preview step without creating a commit |
 | `--config` | — | Path String | `None` | Read execution parameters from a non-standard configuration layout |
+|`--deep`| — | Flag (store_true) | `False` | Summarize each file separately |
 
 ### Examples
 
