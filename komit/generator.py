@@ -1,6 +1,4 @@
 #komit/generator.py
-from http import client
-
 import requests
 import httpx
 from komit.git_utils import parse_branch_name, get_changed_files, get_recent_commits, allocate_diff, split_diff_by_file
@@ -69,21 +67,21 @@ def check_ollama_running(url:str)->bool:
         return False
 
 
-def generate_message(diff:str, config:KomitConfig | None=None,branch_info:str="",deep:bool=False)->str:
+def generate_message(diff:str, config:KomitConfig | None=None,branch_info:str="",deep:bool=False)->tuple[str,list[str]|None]:
     config = config or KomitConfig()
 
     changed_files = get_changed_files()
     files_context = f"Modified Files:\n{changed_files}\n\n" if changed_files else ""
 
     recent = get_recent_commits(3)
+    truncated_files = None
     recent_context = f"Recent Commits:\n{recent}\n\n" if recent else ""
     if deep:
         file_chunk = split_diff_by_file(diff)
         summaries = [summarize_file_chunk(f,c,config)for f,c in file_chunk.items()]
         diff = "File summaries:\n"+"\n".join(summaries)
     else:
-
-        diff = allocate_diff(diff,config.max_diff_length)
+        diff,truncated_files = allocate_diff(diff,config.max_diff_length)
     style_rules = STYLES.get(config.style, STYLES["conventional"])
     active_branch = branch_info.strip() if branch_info and branch_info.strip() else ""
 
@@ -120,7 +118,7 @@ def generate_message(diff:str, config:KomitConfig | None=None,branch_info:str=""
                                        "content":f"Review this git diff and generate the commit message:\n\n{recent_context}{files_context}Git Diff:\n{diff}"
                                    }
                                ])
-        return response.message.content.strip().strip('`').strip()
+        return response.message.content.strip().strip('`').strip(),truncated_files
     except httpx.TimeoutException:
         raise RuntimeError(
             f"Generation timed out after {config.timeout}s.\n"

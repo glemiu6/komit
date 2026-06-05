@@ -11,6 +11,12 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - None
 
 ---
+
+## [0.4.3] - 2026-06-05
+
+### Added
+- Better truncation message for large diffs
+
 ## [0.4.2] - 2026-05-31
 ### Added
 - `--deep` flag for per-file diff summarization (slower but more accurate on large changesets)
@@ -222,6 +228,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Published to PyPI
 
 [Unreleased]: https://github.com/glemiu6/komit/compare/v0.4.2...HEAD
+[0.4.3]: https://github.com/glemiu6/komit/compare/v0.4.2...v0.4.3
 [0.4.2]: https://github.com/glemiu/komit/compare/v0.4.0...v0.4.2
 [0.4.0]: https://github.com/glemiu/komit/compare/v0.3.5...v0.4.0
 [0.3.5]: https://github.com/glemiu6/komit/compare/v0.3.2...v0.3.5

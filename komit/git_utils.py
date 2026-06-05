@@ -75,14 +75,16 @@ def split_diff_by_file(diff:str)->dict[str,str]:
         chunks[filename] = "diff --git " + part
     return chunks
 
-def allocate_diff(diff:str,max_length:int)->str:
+def allocate_diff(diff:str,max_length:int)->tuple[str,list[str]]:
     DOC_EXTENSION = {".md",".txt",".rst",".changelog"}
     import os
     file_chunk = split_diff_by_file(diff)
     if not file_chunk:
-        return diff[:max_length] + "\n... (truncated)" if len(diff) > max_length else diff
+        truncated = diff[:max_length] + "\n... (truncated)" if len(diff) > max_length else diff
+        return truncated,["(unknown file)"] if len(diff) > max_length else []
 
     process = []
+    truncated_files = []
     for filename,chunk in file_chunk.items():
         ext= os.path.splitext(filename)[1].lower()
         if ext in DOC_EXTENSION:
@@ -95,4 +97,5 @@ def allocate_diff(diff:str,max_length:int)->str:
             process.append(chunk)
         else:
             process.append(chunk[:limit] + "\n... (truncated)")
-    return "\n".join(process)
+            truncated_files.append(filename)
+    return "\n".join(process),truncated_files

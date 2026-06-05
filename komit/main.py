@@ -165,7 +165,11 @@ def run():
     try:
         status_msg = "Generating commit message (deep mode)..." if args.deep else "Generate commit message..."
         with console.status(status_msg, spinner="dots"):
-            message= generate_message(diff=diff,config=config,branch_info=branch_name,deep=args.deep)
+            message,truncated= generate_message(diff=diff,config=config,branch_info=branch_name,deep=args.deep)
+            if truncated:
+                console.print(f"[yellow]!! Large files were truncated: {', '.join(truncated)}[/yellow]")
+                console.print("[dim]Use --deep for full analysis or increase the --max_diff[/dim]")
+
         if not message or not isinstance(message, str):
             console.print("Invalid response from generator")
             sys.exit(1)
