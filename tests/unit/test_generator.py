@@ -148,7 +148,7 @@ class TestGenerateMessageReturn:
             mock_check,
             mock_model_exist):
         mock_client_cls.return_value.chat.return_value = self._make_mock_response("  feat: add thing  ")
-        result = generate_message("diff")
+        result,[] = generate_message("diff")
         assert result == "feat: add thing"
 
     @patch("komit.generator.model_exist", return_value=True)
@@ -158,8 +158,8 @@ class TestGenerateMessageReturn:
             mock_check,
             mock_model_exist):
         mock_client_cls.return_value.chat.return_value = self._make_mock_response("fix: resolve null pointer")
-        result = generate_message("diff", KomitConfig())
-        assert result == "fix: resolve null pointer"
+        result,[] = generate_message("diff", KomitConfig())
+        assert result == "fix: resolve null pointer",[]
 
     @patch("komit.generator.model_exist", return_value=True)
     @patch("komit.generator.check_ollama_running", return_value=True)
@@ -168,7 +168,7 @@ class TestGenerateMessageReturn:
             mock_check,
             mock_model_exist):
         mock_client_cls.return_value.chat.return_value = self._make_mock_response("chore: update deps")
-        result = generate_message("diff", None)
+        result,[] = generate_message("diff", None)
         assert result == "chore: update deps"
         call_kwargs = mock_client_cls.return_value.chat.call_args.kwargs
         assert call_kwargs["model"] == "qwen2.5:7b"

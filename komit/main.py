@@ -211,7 +211,7 @@ def run():
 
                 try:
                     with console.status("Regenerating...", spinner='dots'):
-                        message= generate_message(diff=diff,config=config,branch_info=branch_name)
+                        message,truncated= generate_message(diff=diff,config=config,branch_info=branch_name)
                     console.print(Panel(message,title= "New suggested message:",border_style="green"))
                 except RuntimeError as e:
                     console.print(f"Error: {e}")
