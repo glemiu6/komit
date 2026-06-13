@@ -1,4 +1,5 @@
 #komit/git_utils.py
+import os
 import subprocess
 import re
 
@@ -99,3 +100,36 @@ def allocate_diff(diff:str,max_length:int)->tuple[str,list[str]]:
             process.append(chunk[:limit] + "\n... (truncated)")
             truncated_files.append(filename)
     return "\n".join(process),truncated_files
+
+
+def install_hooks():
+    import stat
+    try:
+        result = subprocess.run(
+            ["git","rev-parse","--git-path","hooks"]
+            ,check=True,
+            text=True,
+            encoding='utf-8',
+            capture_output=True
+        )
+        hooks_dir = result.stdout.strip()
+    except subprocess.CalledProcessError:
+        raise RuntimeError("Not inside a valid git repository")
+
+    os.makedirs(hooks_dir,exist_ok=True)
+    hook_path = os.path.join(hooks_dir,"prepare-commit-msg")
+    hook_scrpt ="""#!/sh
+    if [ ! -t 0 ]; then
+        exit 0
+    fi
+    
+    if [ -n "$2" ]; then
+        exit 0
+    fi
+    
+    komit --hook-mode --msg-file "$1"
+    """
+    with open(hook_path,"w",encoding='utf-8') as f:
+        f.write(hook_scrpt)
+    st = os.stat(hook_path)
+    os.chmod(hook_path,st.st_mode | stat.S_IEXEC)
