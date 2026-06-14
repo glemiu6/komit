@@ -9,6 +9,7 @@ AI-powered git commit message generator using local LLMs via Ollama. No API keys
 [![License](https://img.shields.io/github/license/glemiu6/komit)](https://github.com/glemiu6/komit/blob/master/LICENSE)
 [![Downloads](https://static.pepy.tech/badge/komit/month)](https://pepy.tech/project/komit)
 [![CI](https://github.com/glemiu6/komit/actions/workflows/ci.yaml/badge.svg)](https://github.com/glemiu6/komit/actions)
+[![codecov](https://codecov.io/gh/glemiu6/komit/branch/master/graph/badge.svg)](https://codecov.io/gh/glemiu6/komit)
 
 ---
 

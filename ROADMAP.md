@@ -89,10 +89,9 @@ Features are grouped by phase, ordered by priority.
 
 | Feature | Status |
 |---------|--------|
-| pytest-cov + coverage badge | 📋 |
+| pytest-cov + coverage badge | ✅ |
 | Full type hints + mypy in CI | 📋 |
 | Ruff (lint + format) | 📋 |
-| pre-commit hooks for the repo | 📋 |
 
 ---
 

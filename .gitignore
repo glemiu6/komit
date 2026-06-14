@@ -8,3 +8,7 @@ dist/
 build/
 *.egg-info/
 CLAUDE.md
+.coverage
+htmlcov/
+coverage.xml
+.pytest_cache/
