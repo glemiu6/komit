@@ -108,19 +108,6 @@ def parse_args(argv=None):
         help="Summarize each file separately for better commit messages on large diffs (slower)."
     )
 
-    #flag for enable hook mode
-    execution_group.add_argument(
-        '--hook-mode',
-        action="store_true",
-        help=argparse.SUPPRESS
-    )
-
-    execution_group.add_argument(
-        '--msg-file',
-        default=None,
-        metavar="<path>",
-        help=argparse.SUPPRESS
-    )
     #subparser for action commands
     subparser = parser.add_subparsers(
         title="Available Maintenance Commands",
@@ -141,10 +128,7 @@ def parse_args(argv=None):
         'uninstall',
         help="Safely remove komit from your system."
     )
-    subparser.add_parser(
-        'install-hook',
-        help="Integrate komit seamlessly as an automated Git hook."
-    )
+
     return parser.parse_args(argv)
 def run():
     console = Console()
