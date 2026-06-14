@@ -72,19 +72,9 @@ Features are grouped by phase, ordered by priority.
 
 ---
 
-## Phase 5 — Git hook integration
-> Goal: komit runs automatically, zero friction
 
-| Feature | Status |
-|---------|--------|
-| `komit install-hook` command | 📋 |
-| `prepare-commit-msg` hook support | 📋 |
-| Timeout + graceful fallback (never blocks commits) | 📋 |
-| `komit uninstall-hook` command | 📋 |
 
----
-
-## Phase 6 — Engineering quality
+## Phase 5 — Engineering quality
 > Goal: industry-grade codebase
 
 | Feature | Status |
@@ -95,7 +85,7 @@ Features are grouped by phase, ordered by priority.
 
 ---
 
-## Phase 7 — Documentation
+## Phase 6 — Documentation
 > Goal: welcoming to contributors
 
 | Feature | Status |
@@ -107,7 +97,7 @@ Features are grouped by phase, ordered by priority.
 
 ---
 
-## Phase 8 — Distribution
+## Phase 7 — Distribution
 > Goal: installable everywhere, across platforms and architectures
 
 | Feature | Status |
