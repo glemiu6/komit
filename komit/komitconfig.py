@@ -14,11 +14,16 @@ class KomitConfig:
     def from_sources(cls,args):
         file_config=load_config_file(args.config)
 
+        def pick(arg_val, file_key, default):
+            if arg_val is not None:
+                return arg_val
+            return file_config.get(file_key, default)
+
         return cls(
-            model=args.model or file_config.get('model',cls.model),
-            style=args.style or file_config.get('style',cls.style),
-            max_diff_length=args.max_diff or file_config.get('max_diff_length',cls.max_diff_length),
-            ollama_url=args.ollama_url or file_config.get('ollama_url',cls.ollama_url),
-            timeout=args.timeout or file_config.get('timeout',cls.timeout),
-            include_branch_name=args.include_branch_name or file_config.get('include_branch_name',cls.include_branch_name)
+            model=pick(args.model,"model",cls.model),
+            style=pick(args.style,"style",cls.style),
+            max_diff_length=pick(args.max_diff,"max_diff_length",cls.max_diff_length),
+            ollama_url=pick(args.ollama_url,"ollama_url",cls.ollama_url),
+            timeout=pick(args.timeout,"timeout",cls.timeout),
+            include_branch_name=pick(args.include_branch_name,"include_branch_name",cls.include_branch_name)
         )
