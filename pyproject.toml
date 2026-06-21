@@ -56,7 +56,11 @@ ignore = []
 [tool.git-cliff.changelog]
 header = "# Changelog\n\n"
 body = """
+{% if version %}\
 ## [{{ version }}] - {{ timestamp | date(format="%Y-%m-%d") }}
+{% else %}\
+## [Unreleased]
+{% endif %}\
 {% for group, commits in commits | group_by(attribute="group") %}
 ### {{ group }}
 {% for commit in commits %}
