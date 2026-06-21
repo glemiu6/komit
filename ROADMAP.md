@@ -92,8 +92,8 @@ Features are grouped by phase, ordered by priority.
 |------------------------------------------------|--------|
 | `CHANGELOG.md` (Keep a Changelog format)       | ✅ |
 | `CONTRIBUTING.md`                              | ✅ |
-| GitHub issue templates (bug + feature request) | 📋 |
-| Auto changelog with git-cliff                  | 📋 |
+| GitHub issue templates (bug + feature request) | ✅ |
+| Auto changelog with git-cliff                  | ✅ |
 | `Buy me a coffee` sticker                      |📋| 
 
 ---
