@@ -53,6 +53,7 @@ CRITICAL INSTRUCTIONS:
 
 4. OUTPUT RULES:
 - Do NOT include empty brackets "[]" or empty parentheses "()".
+- Do NOT append branch names unless explicitly instructed in the BRANCH HANDLING RULE above.
 - Output ONLY the raw commit message text.
 - NO markdown formatting, NO backticks, NO code blocks, NO explanations.
 """
@@ -108,12 +109,14 @@ def generate_message(
     else:
         branch_context = (
             "MANDATORY RULE: No branch information is available. "
-            "Do NOT append any square brackets, placeholders, empty braces '[]', or branch names to the message. "  # noqa: E501
-            "Do NOT copy bracket patterns from recent commit history."
+            "Do NOT append any square brackets, placeholders, empty braces '[]', or branch names to the message. "
+            "Do NOT copy bracket patterns from recent commit history. "
+            "Do NOT guess or infer a branch name. "
+            "The commit message must end with the description text only — no suffixes of any kind."
         )
     system_prompt = SYSTEM_PROMPT_TEMPLATE.format(
         style_rules=style_rules, branch_context=branch_context
-    )  # noqa: E501
+    )
     if not check_ollama_running(config.ollama_url):
         raise Exception(
             "Ollama is not running. Please start it using `ollama serve` and try again."
