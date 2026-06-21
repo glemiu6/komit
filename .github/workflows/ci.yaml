@@ -47,7 +47,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN}}
 
       - name: Generate changelog
-        uses: orhun/git-cliff-action@v3
+        uses: orhun/git-cliff-action@v4
         with:
           config: pyproject.toml
           args: --latest

@@ -13,6 +13,9 @@ AI-powered git commit message generator using local LLMs via Ollama. No API keys
 
 ---
 
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=flat&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/glemiu6)
+
+---
 ## Features
 
 - 🧠 **Local LLM** — uses Ollama, no API keys needed
