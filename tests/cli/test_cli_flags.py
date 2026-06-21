@@ -1,5 +1,6 @@
 import sys
 from unittest.mock import patch
+
 from komit.main import parse_args
 
 

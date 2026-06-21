@@ -10,14 +10,17 @@ def get_staged_diff() -> str:
         text=True,
         encoding="utf-8",
         errors="replace",
-    )  # noqa: E501
+    )
     return result.stdout
 
 
 def get_staged_files() -> list[str]:
     result = subprocess.run(
-        ["git", "diff", "--staged", "--name-only"], capture_output=True, text=True, encoding="utf-8"
-    )  # noqa: E501
+        ["git", "diff", "--staged", "--name-only"],
+        capture_output=True,
+        text=True,
+        encoding="utf-8"
+    )
     return [f for f in result.stdout.strip().split("\n") if f]
 
 
@@ -28,7 +31,7 @@ def get_changed_files() -> list[str]:
         text=True,
         encoding="utf-8",
         check=True,
-    )  # noqa: E501
+    )
     return [f for f in result.stdout.strip().split("\n") if f]
 
 
@@ -52,14 +55,17 @@ def get_current_branch() -> str:
 
 
 def get_recent_commits(n: int = 3) -> str:
-    result = subprocess.run(
-        ["git", "log", f"-{n}", "--oneline"],
-        check=True,
-        text=True,
-        encoding="utf-8",
-        capture_output=True,
-    )
-    return result.stdout.strip()
+    try:
+        result = subprocess.run(
+            ["git", "log", f"-{n}", "--oneline"],
+            check=True,
+            text=True,
+            encoding="utf-8",
+            capture_output=True,
+        )
+        return result.stdout.strip()
+    except subprocess.CalledProcessError:
+        return ""
 
 
 def is_git_repo() -> bool:
@@ -68,7 +74,7 @@ def is_git_repo() -> bool:
         capture_output=True,
         text=True,
         encoding="utf-8",
-    )  # noqa: E501
+    )
     return result.returncode == 0
 
 

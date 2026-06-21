@@ -103,8 +103,8 @@ Features are grouped by phase, ordered by priority.
 
 | Feature | Status |
 |---------|-------|
-| Homebrew formula (`brew install komit`) | 📋 |
-| Shell completion (`komit --<TAB>`) | 📋 |
+| Homebrew formula (`brew install komit`) | 🔄 |
+| Shell completion (`komit --<TAB>`) | ✅ |
 | `komit update` self-update command | ✅ |
 | Dependabot for dependency updates | 📋 |
 | Update scripts via curl/irm (Linux, macOS, Windows) | ✅ |

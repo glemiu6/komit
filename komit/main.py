@@ -4,6 +4,7 @@ import argparse
 import subprocess
 import sys
 
+import argcomplete
 from rich.console import Console
 from rich.panel import Panel
 from rich.prompt import Prompt
@@ -124,7 +125,7 @@ def parse_args(argv=None):
     subparser.add_parser("init", help="Create a fresh base configuration file.")
     subparser.add_parser("update", help="Pull down the latest version updates.")
     subparser.add_parser("uninstall", help="Safely remove komit from your system.")
-
+    argcomplete.autocomplete(parser)
     return parser.parse_args(argv)
 
 
