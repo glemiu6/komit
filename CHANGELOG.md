@@ -5,8 +5,10 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 
 ---
-
 ## [Unreleased]
+
+---
+## [0.4.4]
 
 ### Added
 - Test coverage with pytest-cov
@@ -18,7 +20,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Fixed
 - `or` chaining bug in `KomitConfig.from_sources` — `False` values now correctly override defaults
 - `import pip` replaced with `importlib.util.find_spec` to satisfy ruff F401
----
+
 
 ## [0.4.3] - 2026-06-05
 
@@ -236,6 +238,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Published to PyPI
 
 [Unreleased]: https://github.com/glemiu6/komit/compare/v0.4.2...HEAD
+[0.4.4]: https://github.com/glemiu6/komit/compare/v0.4.3...v0.4.4
 [0.4.3]: https://github.com/glemiu6/komit/compare/v0.4.2...v0.4.3
 [0.4.2]: https://github.com/glemiu/komit/compare/v0.4.0...v0.4.2
 [0.4.0]: https://github.com/glemiu/komit/compare/v0.3.5...v0.4.0
