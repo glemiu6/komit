@@ -51,6 +51,30 @@ target-version = "py313"
 [tool.ruff.lint]
 select = ["E","F","I"]
 ignore = []
+
+
+[tool.git-cliff.changelog]
+header = "# Changelog\n\n"
+body = """
+## [{{ version }}] - {{ timestamp | date(format="%Y-%m-%d") }}
+{% for group, commits in commits | group_by(attribute="group") %}
+### {{ group }}
+{% for commit in commits %}
+- {{ commit.message }}
+{% endfor %}
+{% endfor %}
+"""
+
+[tool.git-cliff.git]
+conventional_commits = true
+commit_parsers = [
+    { message = "^feat", group = "Added" },
+    { message = "^fix", group = "Fixed" },
+    { message = "^chore", group = "Changed" },
+    { message = "^docs", group = "Documentation" },
+]
+
+
 [project.urls]
 Homepage = "https://github.com/glemiu6/komit"
 Repository = "https://github.com/glemiu6/komit"
