@@ -1,22 +1,23 @@
 # komit/config_utils.py
 
-from platformdirs import user_config_dir
 import os
 import tomllib
+
+from platformdirs import user_config_dir
 
 APP_NAME = "komit"
 
 
-def get_default_config_path():
+def get_default_config_path() -> str:
     config_dir = user_config_dir(APP_NAME)
     os.makedirs(config_dir, exist_ok=True)
-    return os.path.join(config_dir, 'config.toml')
+    return os.path.join(config_dir, "config.toml")
 
 
-def init_config():
+def init_config() -> None:
     paths = get_default_config_path()
     if os.path.exists(paths):
-        choice = input(f"Config file already. Overwrite? (y/n): ").lower()
+        choice = input("Config file already. Overwrite? (y/n): ").lower()
         if choice != "y":
             return
 
@@ -39,19 +40,19 @@ max_diff_length = {max_diff}
 timeout = {timeout}
 include_branch_name = {include_branch_name}
 """
-    with open(paths, 'w') as f:
+    with open(paths, "w") as f:
         f.write(content.strip())
     print(f"Config file created at {paths}")
 
 
-def load_config_file(file_path=None):
+def load_config_file(file_path=None) -> dict:
     config_file = file_path or get_default_config_path()
 
     if not os.path.exists(config_file):
         return {}
     try:
-        with open(config_file, 'rb') as f:
+        with open(config_file, "rb") as f:
             return tomllib.load(f)
-    except Exception as e:
-        print(f"Failed to load config file, using default config")
+    except Exception:
+        print("Failed to load config file, using default config")
         return {}

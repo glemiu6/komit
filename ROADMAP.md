@@ -80,20 +80,21 @@ Features are grouped by phase, ordered by priority.
 | Feature | Status |
 |---------|--------|
 | pytest-cov + coverage badge | ✅ |
-| Full type hints + mypy in CI | 📋 |
-| Ruff (lint + format) | 📋 |
+| Full type hints + mypy in CI | ✅ |
+| Ruff (lint + format) | ✅ |
 
 ---
 
 ## Phase 6 — Documentation
 > Goal: welcoming to contributors
 
-| Feature | Status |
-|---------|--------|
-| `CHANGELOG.md` (Keep a Changelog format) | ✅ |
-| `CONTRIBUTING.md` | ✅ |
+| Feature                                        | Status |
+|------------------------------------------------|--------|
+| `CHANGELOG.md` (Keep a Changelog format)       | ✅ |
+| `CONTRIBUTING.md`                              | ✅ |
 | GitHub issue templates (bug + feature request) | 📋 |
-| Auto changelog with git-cliff | 📋 |
+| Auto changelog with git-cliff                  | 📋 |
+| `Buy me a coffee` sticker                      |📋| 
 
 ---
 

@@ -1,9 +1,16 @@
-#komit/generator.py
-import requests
+# komit/generator.py
 import httpx
-from komit.git_utils import parse_branch_name, get_changed_files, get_recent_commits, allocate_diff, split_diff_by_file
+import requests
 
+from komit.git_utils import (
+    allocate_diff,
+    get_changed_files,
+    get_recent_commits,
+    parse_branch_name,
+    split_diff_by_file,
+)
 from komit.komitconfig import KomitConfig
+
 STYLES = {
     "conventional": (
         "Generate a conventional commit message (type: description).\n"
@@ -51,23 +58,26 @@ CRITICAL INSTRUCTIONS:
 """
 
 
-def model_exist(url:str,model:str)->bool:
+def model_exist(url: str, model: str) -> bool:
     try:
-        r = requests.get(f"{url}/api/tags",timeout=5)
-        models = [m["name"] for m in r.json().get("models",[])]
+        r = requests.get(f"{url}/api/tags", timeout=5)
+        models = [m["name"] for m in r.json().get("models", [])]
         return model in models
-    except:
+    except Exception:  # noqa: E722
         return False
 
-def check_ollama_running(url:str)->bool:
+
+def check_ollama_running(url: str) -> bool:
     try:
-        r = requests.get(f"{url}/api/tags",timeout=5)
+        r = requests.get(f"{url}/api/tags", timeout=5)
         return r.status_code == 200
     except requests.exceptions.RequestException:
         return False
 
 
-def generate_message(diff:str, config:KomitConfig | None=None,branch_info:str="",deep:bool=False)->tuple[str,list[str]|None]:
+def generate_message(
+    diff: str, config: KomitConfig | None = None, branch_info: str = "", deep: bool = False
+) -> tuple[str, list[str] | None]:  # noqa: E501
     config = config or KomitConfig()
 
     changed_files = get_changed_files()
@@ -78,10 +88,10 @@ def generate_message(diff:str, config:KomitConfig | None=None,branch_info:str=""
     recent_context = f"Recent Commits:\n{recent}\n\n" if recent else ""
     if deep:
         file_chunk = split_diff_by_file(diff)
-        summaries = [summarize_file_chunk(f,c,config)for f,c in file_chunk.items()]
-        diff = "File summaries:\n"+"\n".join(summaries)
+        summaries = [summarize_file_chunk(f, c, config) for f, c in file_chunk.items()]
+        diff = "File summaries:\n" + "\n".join(summaries)
     else:
-        diff,truncated_files = allocate_diff(diff,config.max_diff_length)
+        diff, truncated_files = allocate_diff(diff, config.max_diff_length)
     style_rules = STYLES.get(config.style, STYLES["conventional"])
     active_branch = branch_info.strip() if branch_info and branch_info.strip() else ""
 
@@ -92,33 +102,39 @@ def generate_message(diff:str, config:KomitConfig | None=None,branch_info:str=""
             branch_context += f"INFERRED COMMIT TYPE: {parsed_branch['type']}\n"
         if parsed_branch["scope"]:
             branch_context += f"INFERRED CODESPACE SCOPE: {parsed_branch['scope']}\n"
-        branch_context += f"MANDATORY SUFFIX: Use exactly '[{active_branch}]' at the end of the title line."
+        branch_context += (
+            f"MANDATORY SUFFIX: Use exactly '[{active_branch}]' at the end of the title line."  # noqa: E501
+        )
     else:
-        branch_context = "MANDATORY RULE: No branch information is available. Do NOT append any square brackets, placeholders, empty braces '[]', or branch names to the message."
+        branch_context = "MANDATORY RULE: No branch information is available. Do NOT append any square brackets, placeholders, empty braces '[]', or branch names to the message."  # noqa: E501
 
-    system_prompt = SYSTEM_PROMPT_TEMPLATE.format(style_rules=style_rules, branch_context=branch_context)
+    system_prompt = SYSTEM_PROMPT_TEMPLATE.format(
+        style_rules=style_rules, branch_context=branch_context
+    )  # noqa: E501
     if not check_ollama_running(config.ollama_url):
         raise Exception(
             "Ollama is not running. Please start it using `ollama serve` and try again."
         )
     if not model_exist(config.ollama_url, config.model):
-        raise Exception(f"Model `{config.model}` not found locally.\n"
-                        f"Run: `ollama pull {config.model}`")
+        raise Exception(
+            f"Model `{config.model}` not found locally.\nRun: `ollama pull {config.model}`"
+        )
     try:
-        from ollama import Client,ChatResponse
+        from ollama import ChatResponse, Client
+
         client = Client(host=config.ollama_url, timeout=httpx.Timeout(config.timeout))
-        response: ChatResponse = client.chat(model=config.model,
-                               messages=[
-                                   {
-                                       "role":'system',
-                                       "content":system_prompt
-                                   },
-                                   {
-                                       "role":'user',
-                                       "content":f"Review this git diff and generate the commit message:\n\n{recent_context}{files_context}Git Diff:\n{diff}"
-                                   }
-                               ])
-        return response.message.content.strip().strip('`').strip(),truncated_files
+        response: ChatResponse = client.chat(
+            model=config.model,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {
+                    "role": "user",
+                    "content": f"Review this git diff and generate the commit message:\n\n{recent_context}{files_context}Git Diff:\n{diff}",  # noqa: E501
+                },
+            ],
+        )
+        con = response.message.content or ""
+        return con.strip().strip("`").strip(), truncated_files
     except httpx.TimeoutException:
         raise RuntimeError(
             f"Generation timed out after {config.timeout}s.\n"
@@ -129,55 +145,62 @@ def generate_message(diff:str, config:KomitConfig | None=None,branch_info:str=""
         raise RuntimeError(f"Failed to generate commit message: {e}")
 
 
-def explain_changes(diff:str, config:KomitConfig | None=None)->str:
+def explain_changes(diff: str, config: KomitConfig | None = None) -> str:
     config = config or KomitConfig()
 
-    if len(diff)>config.max_diff_length:
-        diff = diff[:config.max_diff_length] + "\n... (truncated)"
+    if len(diff) > config.max_diff_length:
+        diff = diff[: config.max_diff_length] + "\n... (truncated)"
 
     if not check_ollama_running(config.ollama_url):
         raise Exception("Ollama is not running. Please start by using `ollama serve`.")
     if not model_exist(config.ollama_url, config.model):
-        raise Exception(f"Model `{config.model}` not found locally.\nRun `ollama pull {config.model}`")
+        raise Exception(
+            f"Model `{config.model}` not found locally.\nRun `ollama pull {config.model}`"
+        )  # noqa: E501
 
     try:
         from ollama import Client
+
         client = Client(host=config.ollama_url, timeout=httpx.Timeout(config.timeout))
-        response = client.chat(model=config.model, messages=[
-            {
-                "role":'system',
-                "content":(
-                    "You are a code reviewer. Explain what the following git diff does "
-                    "in plain English only. Use a numbered list, one item per changed file or feature. "
-                    "Be concise, focus on what changed and why it matters. "
-                    "No markdown formatting, no bold text, no asterisks, no backticks, plain text only."
-                )
-            },
-            {
-                "role":'user',
-                "content":f"Explain these changes:\n\n{diff}"
-            }
-        ])
-        return response.message.content.strip().strip('`').strip()
+        response = client.chat(
+            model=config.model,
+            messages=[
+                {
+                    "role": "system",
+                    "content": (
+                        "You are a code reviewer. Explain what the following git diff does "
+                        "in plain English only. Use a numbered list, one item per changed file or feature. "  # noqa: E501
+                        "Be concise, focus on what changed and why it matters. "
+                        "No markdown formatting, no bold text, no asterisks, no backticks, plain text only."  # noqa: E501
+                    ),
+                },
+                {"role": "user", "content": f"Explain these changes:\n\n{diff}"},
+            ],
+        )
+        con = response.message.content or ""
+        return con.strip().strip("`").strip()
     except httpx.TimeoutException:
         raise RuntimeError(f"Timed out after {config.timeout}s.")
     except Exception as e:
         raise RuntimeError(f"Failed to explain changes: {e}")
 
 
-def summarize_file_chunk(filename:str,chunk:str,config:KomitConfig | None=None)->str:
+def summarize_file_chunk(filename: str, chunk: str, config: KomitConfig | None = None) -> str:
+    config = config or KomitConfig()
     from ollama import Client
-    client = Client(host=config.ollama_url,timeout=httpx.Timeout(config.timeout))
-    response = client.chat(model=config.model,messages=[
-        {
-            "role":"system",
-            "content":f"You are a Senior Software developer. Summarize what changed in this file diff in one short sentence in English only. "
-                      f"Be concise, focus on what changed and why it matters. "
-                      f"Plain text only, no markdown, no bold, no asterisks, no backticks."
-        },
-        {
-            "role":"user",
-            "content":f"File: {filename}\n\n{chunk}"
-        }
-    ])
-    return f"{filename}: {response.message.content.strip()}"
+
+    client = Client(host=config.ollama_url, timeout=httpx.Timeout(config.timeout))
+    response = client.chat(
+        model=config.model,
+        messages=[
+            {
+                "role": "system",
+                "content": "You are a Senior Software developer. Summarize what changed in this file diff in one short sentence in English only. "  # noqa: E501
+                "Be concise, focus on what changed and why it matters. "
+                "Plain text only, no markdown, no bold, no asterisks, no backticks.",
+            },
+            {"role": "user", "content": f"File: {filename}\n\n{chunk}"},
+        ],
+    )
+    con = response.message.content or ""
+    return f"{filename}: {con.strip()}"

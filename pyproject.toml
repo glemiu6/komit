@@ -16,6 +16,7 @@ classifiers = [
 ]
 dependencies = [
     "httpx>=0.28.1",
+    "mypy>=2.1.0",
     "ollama>=0.4.0",
     "pip>=26.1.1",
     "platformdirs>=4.9.6",
@@ -36,8 +37,20 @@ dev = [
     "twine>=6.2.0",
     "pyinstaller>=6.0.0",
     "pytest-cov>=7.1.0",
+    "ruff>=0.4.0"
 ]
+[tool.mypy]
+python_version = "3.13"
+strict = false
+ignore_missing_imports = true
 
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["E","F","I"]
+ignore = []
 [project.urls]
 Homepage = "https://github.com/glemiu6/komit"
 Repository = "https://github.com/glemiu6/komit"

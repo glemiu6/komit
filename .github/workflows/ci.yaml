@@ -29,6 +29,15 @@ jobs:
       - name: Install dependencies
         run: uv sync --dev
 
+      - name: Type check with mypy
+        run: uv run mypy komit/
+
+      - name: Lint with Ruff
+        run: uv run ruff check komit/
+
+      - name: Format check with Ruff
+        run: uv run ruff format --check komit/
+
       - name: Run tests with coverage
         run: uv run pytest --cov=komit --cov-report=xml
 

@@ -8,9 +8,16 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
- ### Added
-- Test coverage with pycov for the CI pipeline
+### Added
+- Test coverage with pytest-cov
+- Codecov integration for coverage reporting in CI
+- mypy type checking in CI
+- Ruff linting and format checking in CI
+- Full type hints across `generator.py`
 
+### Fixed
+- `or` chaining bug in `KomitConfig.from_sources` — `False` values now correctly override defaults
+- `import pip` replaced with `importlib.util.find_spec` to satisfy ruff F401
 ---
 
 ## [0.4.3] - 2026-06-05
