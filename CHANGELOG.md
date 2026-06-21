@@ -7,7 +7,12 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ---
 ## [Unreleased]
 
----
+### Added
+- Working on brew formula for macOS support [homebrew-komit](https://github.com/glemiu6/homebrew-komit)
+
+### Fixed
+- Branch detection correction in the system prompt
+
 
 ## [0.5.1]
 
