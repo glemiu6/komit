@@ -106,8 +106,11 @@ def generate_message(
             f"MANDATORY SUFFIX: Use exactly '[{active_branch}]' at the end of the title line."  # noqa: E501
         )
     else:
-        branch_context = "MANDATORY RULE: No branch information is available. Do NOT append any square brackets, placeholders, empty braces '[]', or branch names to the message."  # noqa: E501
-
+        branch_context = (
+            "MANDATORY RULE: No branch information is available. "
+            "Do NOT append any square brackets, placeholders, empty braces '[]', or branch names to the message. "  # noqa: E501
+            "Do NOT copy bracket patterns from recent commit history."
+        )
     system_prompt = SYSTEM_PROMPT_TEMPLATE.format(
         style_rules=style_rules, branch_context=branch_context
     )  # noqa: E501
