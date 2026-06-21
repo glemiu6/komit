@@ -90,11 +90,11 @@ Features are grouped by phase, ordered by priority.
 
 | Feature                                        | Status |
 |------------------------------------------------|--------|
-| `CHANGELOG.md` (Keep a Changelog format)       | ✅ |
-| `CONTRIBUTING.md`                              | ✅ |
-| GitHub issue templates (bug + feature request) | ✅ |
-| Auto changelog with git-cliff                  | ✅ |
-| `Buy me a coffee` sticker                      |📋| 
+| `CHANGELOG.md` (Keep a Changelog format)       | ✅      |
+| `CONTRIBUTING.md`                              | ✅      |
+| GitHub issue templates (bug + feature request) | ✅      |
+| Auto changelog with git-cliff                  | ✅      |
+| `Buy me a coffee` sticker                      | ✅     | 
 
 ---
 
