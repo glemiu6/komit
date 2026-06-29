@@ -7,12 +7,14 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ---
 ## [Unreleased]
 
+- None
+
+## [1.0.0]
+
 ### Added
-- Working on brew formula for macOS support [homebrew-komit](https://github.com/glemiu6/homebrew-komit)
-
-### Fixed
-- Branch detection correction in the system prompt
-
+- ARM64 support is only with pip install
+- dependabot integration
+- `brew tap glemiu6/komit ` and `brew install komit` for macOS support
 
 ## [0.5.1]
 
@@ -252,6 +254,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Published to PyPI
 
 [Unreleased]: https://github.com/glemiu6/komit/compare/v0.4.2...HEAD
+[1.0.0]: https://github.com/glemiu6/komit/compare/v0.5.1...v1.0.0
 [0.5.1]: https://github.com/glemiu6/komit/compare/v0.4.4...v0.5.1
 [0.4.4]: https://github.com/glemiu6/komit/compare/v0.4.3...v0.4.4
 [0.4.3]: https://github.com/glemiu6/komit/compare/v0.4.2...v0.4.3

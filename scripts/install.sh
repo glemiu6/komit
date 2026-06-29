@@ -10,7 +10,7 @@ detect_platform() {
       Linux)
         case $ARCH in
           x86_64)   BINARY="komit-linux-x86_64" ;;
-          aarch64)  BINARY="komit-linux-arm64" ;;
+          aarch64)  echo "ARM64 detected. Use: pip install komit"; exit 1 ;;
           *)        echo "Unsupported architecture: $ARCH"; exit 1 ;;
         esac
         INSTALL_DIR="/usr/local/bin"

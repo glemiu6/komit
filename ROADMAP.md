@@ -106,9 +106,8 @@ Features are grouped by phase, ordered by priority.
 | Homebrew formula (`brew install komit`) | 🔄 |
 | Shell completion (`komit --<TAB>`) | ✅ |
 | `komit update` self-update command | ✅ |
-| Dependabot for dependency updates | 📋 |
+| Dependabot for dependency updates | ✅ |
 | Update scripts via curl/irm (Linux, macOS, Windows) | ✅ |
-| Linux ARM64 binary support (`komit-linux-arm64`) | 📋 |
 
 ---
 
@@ -122,6 +121,7 @@ These are not scheduled but may be considered based on demand:
 - **VS Code extension** — generate commit messages from within the editor
 - **Commit templates** — per-repo custom commit conventions
 - **`komit review`** — AI review of staged changes before committing
+- Linux ARM64 binary support
 
 ---
 
