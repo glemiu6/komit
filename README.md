@@ -30,7 +30,7 @@ AI-powered git commit message generator using local LLMs via Ollama. No API keys
 - ✏️ **Edit before commit** — open your editor to tweak the message
 - ⚙️ **CLI flags** — control style, model, and more from the command line
 - 📁 **Config file** — persist your preferences with `komit init`
-- 🌍 **Universal** — works via pip, binary, or shell script
+- 🌍 **Universal** — works via pip, binary, Homebrew, or shell script
 - 🪟 **Cross-platform** — Linux, macOS, Windows
 - ⚡ **Fast** — runs on your machine, no network calls to external APIs
 - 🔒 **Ollama validation** — checks if Ollama is running and model exists before generating
@@ -61,31 +61,40 @@ ollama pull qwen2.5:7b
 
 ## Installation
 
-### Option 1 — One line install (Linux/macOS, no Python required)
+### Option 1 — Homebrew (macOS/Linux, recommended)
+
+```bash
+brew tap glemiu6/komit
+brew install komit
+```
+
+Shell completion is included automatically — no extra setup needed.
+
+### Option 2 — One line install (Linux/macOS, no Python required)
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/glemiu6/komit/master/scripts/install.sh | bash
 ```
 
-### Option 2 — Windows PowerShell
+### Option 3 — Windows PowerShell
 
 ```powershell
 irm https://raw.githubusercontent.com/glemiu6/komit/master/scripts/install.ps1 | iex
 ```
 
-### Option 3 — pip
+### Option 4 — pip
 
 ```bash
 pip install komit
 ```
 
-### Option 4 — pipx (recommended for CLI tools)
+### Option 5 — pipx (recommended for CLI tools)
 
 ```bash
 pipx install komit
 ```
 
-### Option 5 — Download binary
+### Option 6 — Download binary
 
 Download the binary for your platform from [GitHub Releases](https://github.com/glemiu6/komit/releases/latest):
 
@@ -117,6 +126,10 @@ Now you can use `git ai` as a shortcut.
 
 ### Shell completion
 
+If installed via **Homebrew**, completion works automatically.
+
+For other install methods, activate it once:
+
 ```bash
 # bash
 echo 'eval "$(register-python-argcomplete komit)"' >> ~/.bashrc
@@ -125,6 +138,9 @@ source ~/.bashrc
 # zsh
 echo 'eval "$(register-python-argcomplete komit)"' >> ~/.zshrc
 source ~/.zshrc
+
+# fish
+register-python-argcomplete --shell fish komit | source
 ```
 
 ---
