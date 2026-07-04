@@ -195,7 +195,7 @@ def run():
 
     if len(files) > 15 and not args.deep:
         console.print(
-            f"[yellow]⚠ {len(files)} files staged — consider committing in smaller batches for better messages.[/yellow]"
+            f"[yellow]⚠ {len(files)} files staged — consider committing in smaller batches for better messages.[/yellow]"  # noqa: E501
         )
     while True:
         choice = Prompt.ask(
