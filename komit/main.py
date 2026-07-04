@@ -192,6 +192,11 @@ def run():
     if args.dry_run:
         console.print("Running in dry-run mode, no actual changes will be made.", style="yellow")
         sys.exit(0)
+
+    if len(files) > 15 and not args.deep:
+        console.print(
+            f"[yellow]⚠ {len(files)} files staged — consider committing in smaller batches for better messages.[/yellow]"
+        )
     while True:
         choice = Prompt.ask(
             "\n[bold cyan]»[/bold cyan] Choose an action: ([green]y[/green])es, ([red]n[/red])o, ([yellow]e[/yellow])dit, ([magenta]r[/magenta])egenerate",  # noqa: E501

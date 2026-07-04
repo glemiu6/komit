@@ -52,10 +52,12 @@ CRITICAL INSTRUCTIONS:
 - Ignore CHANGELOG.md and ROADMAP.md entirely when determining the commit type and message.
 
 4. OUTPUT RULES:
+- Output ONLY the raw commit message text — nothing else.
+- NO analysis, NO explanations, NO tables, NO markdown headers, NO "Key Changes" sections.
+- NO reasoning about what the user should do next.
+- The entire response must be a valid git commit message and nothing else.
 - Do NOT include empty brackets "[]" or empty parentheses "()".
-- Do NOT append branch names unless explicitly instructed in the BRANCH HANDLING RULE above.
-- Output ONLY the raw commit message text.
-- NO markdown formatting, NO backticks, NO code blocks, NO explanations.
+- NO markdown formatting, NO backticks, NO code blocks.
 """
 
 
