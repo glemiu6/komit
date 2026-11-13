@@ -35,6 +35,7 @@ AI-powered git commit message generator using local LLMs via Ollama. No API keys
 - ⚡ **Fast** — runs on your machine, no network calls to external APIs
 - 🔒 **Ollama validation** — checks if Ollama is running and model exists before generating
 - 🔁 **Smart updates** — detects pip vs binary install and updates accordingly
+- ❄️ **Nix / NixOS support** — reproducible installations through Nix Flakes
 
 ---
 
@@ -47,11 +48,11 @@ AI-powered git commit message generator using local LLMs via Ollama. No API keys
 
 ## Recommended Models
 
-| Model | Size | Best for |
-|-------|------|----------|
-| `qwen2.5:7b` | 4.7GB | Best quality |
-| `mistral:7b` | 4.1GB | Good balance |
-| `llama3.2:3b` | 2.0GB | Fastest |
+| Model         | Size  | Best for     |
+| ------------- | ----- | ------------ |
+| `qwen2.5:7b`  | 4.7GB | Best quality |
+| `mistral:7b`  | 4.1GB | Good balance |
+| `llama3.2:3b` | 2.0GB | Fastest      |
 
 ```bash
 ollama pull qwen2.5:7b
@@ -98,11 +99,11 @@ pipx install komit
 
 Download the binary for your platform from [GitHub Releases](https://github.com/glemiu6/komit/releases/latest):
 
-| Platform | Binary |
-| --- | --- |
-| Linux x86_64 | `komit-linux-x86_64` |
-| macOS Apple Silicon | `komit-macos-arm64` |
-| Windows | `komit-windows-x86_64.exe` |
+| Platform            | Binary                     |
+| ------------------- | -------------------------- |
+| Linux x86_64        | `komit-linux-x86_64`       |
+| macOS Apple Silicon | `komit-macos-arm64`        |
+| Windows             | `komit-windows-x86_64.exe` |
 
 > Intel Mac users: use `pip install komit` instead.
 
@@ -111,6 +112,64 @@ Download the binary for your platform from [GitHub Releases](https://github.com/
 chmod +x komit-*
 sudo mv komit-* /usr/local/bin/komit
 ```
+
+### Option 7 — Nix / NixOS
+
+Komit supports reproducible installations through Nix Flakes.
+
+**Install Komit:**
+
+```bash
+nix profile install github:glemiu6/komit
+```
+
+**Run without installing:**
+
+```bash
+nix run github:glemiu6/komit
+```
+
+**Install declaratively on NixOS:**
+
+Add Komit to your `flake.nix` inputs:
+
+```nix
+komit = {
+  url = "github:glemiu6/komit";
+  inputs.nixpkgs.follows = "nixpkgs";
+};
+```
+
+Then include it in your system packages:
+
+```nix
+environment.systemPackages = [
+  inputs.komit.packages.${pkgs.stdenv.hostPlatform.system}.default
+];
+```
+
+The NixOS module must have access to `inputs`, for example through `specialArgs`.
+
+**Update Komit:**
+
+For a standalone Nix profile installation:
+
+```bash
+nix profile upgrade komit
+```
+
+For a NixOS flake installation:
+
+```bash
+nix flake update komit
+sudo nixos-rebuild switch --flake .#desktop
+```
+
+Replace `desktop` with your NixOS configuration name.
+
+**Requirements:** Komit requires access to a running Ollama server and an available model. The Nix package provides the CLI and its Python dependencies, but does not automatically install or configure the Ollama service.
+
+> **Note:** Nix-managed installations should be updated or removed using Nix, not the built-in `komit update` or `komit uninstall` commands.
 
 ---
 
@@ -168,18 +227,18 @@ komit uninstall  # remove komit from your system
 
 ### CLI flags
 
-| Flag | Short | Type | Default | Description |
-| --- | --- | --- | --- | --- |
-| `--style` | `-s` | `conventional`, `simple`, `detailed` | config | Commit message format |
-| `--model` | `-m` | String | config | Ollama model to use |
-| `--ollama-url` | `-u` | URL | config | Ollama API endpoint |
-| `--max_diff` | — | Integer | config | Max diff length in characters |
-| `--timeout` | — | Integer | config | LLM request timeout in seconds |
-| `--include_branch_name` | `-ib` | Bool | config | Append branch name to commit message |
-| `--dry-run` | `-dr` | Flag | `False` | Preview message without committing |
-| `--explain` | — | Flag | `False` | Explain staged changes without committing |
-| `--deep` | — | Flag | `False` | Summarize each file separately (slower, better on large diffs) |
-| `--config` | — | Path | — | Path to a custom config file |
+| Flag                    | Short | Type                                 | Default | Description                                                    |
+| ----------------------- | ----- | ------------------------------------ | ------- | -------------------------------------------------------------- |
+| `--style`               | `-s`  | `conventional`, `simple`, `detailed` | config  | Commit message format                                          |
+| `--model`               | `-m`  | String                               | config  | Ollama model to use                                            |
+| `--ollama-url`          | `-u`  | URL                                  | config  | Ollama API endpoint                                            |
+| `--max_diff`            | —     | Integer                              | config  | Max diff length in characters                                  |
+| `--timeout`             | —     | Integer                              | config  | LLM request timeout in seconds                                 |
+| `--include_branch_name` | `-ib` | Bool                                 | config  | Append branch name to commit message                           |
+| `--dry-run`             | `-dr` | Flag                                 | `False` | Preview message without committing                             |
+| `--explain`             | —     | Flag                                 | `False` | Explain staged changes without committing                      |
+| `--deep`                | —     | Flag                                 | `False` | Summarize each file separately (slower, better on large diffs) |
+| `--config`              | —     | Path                                 | —       | Path to a custom config file                                   |
 
 ### Examples
 
@@ -228,12 +287,12 @@ Model: qwen2.5:7b · Style: conventional
 » Choose an action: (y)es, (n)o, (e)dit, (r)egenerate (y):
 ```
 
-| Option | Key | Behavior |
-| --- | --- | --- |
-| Yes | `y` | Commit with the generated message |
-| No | `n` | Cancel without committing |
-| Edit | `e` | Open your editor to modify the message |
-| Regenerate | `r` | Generate a new message |
+| Option     | Key | Behavior                               |
+| ---------- | --- | -------------------------------------- |
+| Yes        | `y` | Commit with the generated message      |
+| No         | `n` | Cancel without committing              |
+| Edit       | `e` | Open your editor to modify the message |
+| Regenerate | `r` | Generate a new message                 |
 
 ---
 
@@ -261,11 +320,11 @@ komit --explain
 
 When `--include_branch_name` is enabled, komit reads your branch name to infer the commit type and scope automatically.
 
-| Branch | Inferred type | Inferred scope |
-| --- | --- | --- |
-| `feat/auth-login` | `feat` | `auth` |
-| `fix/ui_button` | `fix` | `ui_button` |
-| `refactor/api-layer` | `refactor` | `api` |
+| Branch               | Inferred type | Inferred scope |
+| -------------------- | ------------- | -------------- |
+| `feat/auth-login`    | `feat`        | `auth`         |
+| `fix/ui_button`      | `fix`         | `ui_button`    |
+| `refactor/api-layer` | `refactor`    | `api`          |
 
 Supported types: `feat`, `fix`, `chore`, `docs`, `style`, `refactor`, `test`, `ci`, `perf`.
 

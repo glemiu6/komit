@@ -3,30 +3,48 @@
 All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-
 ---
+
 ## [Unreleased]
 
-- None
+### Added
+
+- Native Nix Flake support for declarative and reproducible installations.
+- Nix package definition using `buildPythonApplication`.
+- Installation support through `nix profile install` and NixOS configurations.
+
+### Changed
+
+- Simplified Python runtime dependencies by separating development tools from application requirements.
+- Adjusted dependency version constraints for compatibility with the selected Nixpkgs revision.
+- Updated Python package license metadata to use the `Apache-2.0` SPDX identifier.
+
+### Fixed
+
+- Removed incorrect MIT license metadata from the Python package configuration.
 
 ## [1.0.0]
 
 ### Added
+
 - ARM64 support is only with pip install
 - dependabot integration
-- `brew tap glemiu6/komit ` and `brew install komit` for macOS support
+- `brew tap glemiu6/komit` and `brew install komit` for macOS support
 
 ## [0.5.1]
 
 ### Added
+
 - TAB autocompletion for `komit --<flag>`
 
 ### Fixed
+
 - `get_recent_commits` error corrected
 
 ## [0.4.4]
 
 ### Added
+
 - Test coverage with pytest-cov
 - Codecov integration for coverage reporting in CI
 - mypy type checking in CI
@@ -34,63 +52,67 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Full type hints across `generator.py`
 
 ### Fixed
+
 - `or` chaining bug in `KomitConfig.from_sources` — `False` values now correctly override defaults
 - `import pip` replaced with `importlib.util.find_spec` to satisfy ruff F401
-
 
 ## [0.4.3] - 2026-06-05
 
 ### Added
+
 - Better truncation message for large diffs
 
 ## [0.4.2] - 2026-05-31
+
 ### Added
+
 - `--deep` flag for per-file diff summarization (slower but more accurate on large changesets)
 - `--explain` flag to summarize staged changes without committing
 - Per-file diff allocation with `split_diff_by_file` and `allocate_diff`
 - Priority-based diff truncation — code files get more context than docs
 
-
 ### Fixed
+
 - CHANGELOG.md and ROADMAP.md ignored when determining commit type
 - Diff truncation now per-file instead of global character count
-
-
 
 ## [0.4.0] - 2026-05-30
 
 ### Added
+
 - `komit --explain` - explain the commits
 - Prompt context include the last 3 commits
 
-
-
 ## [0.3.5] - 2026-05-23
+
 ### Fixed
 
 - `komit --help` flag - improved structure
 - Improved interactive prompt wording for the LLM
 
 ### Added
-- `komit -ib ` - branch detection flag 
+
+- `komit -ib` - branch detection flag
 - Branch detection in the interactive prompt
 - Branch name parsing → infer type + scope
 
 ## [0.3.2] - 2026-05-13
 
 ### Added
+
 - Rich colored output throughout CLI (update, uninstall, commit flow)
 - Spinner while generating commit message
 - Staged files displayed in a panel
 - Suggested commit message displayed in a panel
 
 ### Fixed
-- UnicodeDecodeError on macOS when diff contains non-UTF-8 bytes
 
+- UnicodeDecodeError on macOS when diff contains non-UTF-8 bytes
 
 ## [0.3.0] - 2026-05-10
 
 ### Added
+
 - Windows support: PowerShell installer (`scripts/install.ps1`)
 - Automatic PATH setup on Windows via registry
 - Standardized `komit.exe` install (binary renamed on installation)
@@ -98,6 +120,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Windows binary update support via `komit update`
 
 ### Fixed
+
 - Commit messages no longer wrapped in backticks or Markdown code block
 - GitHub API rate limit error on `komit update` - added PyPI fallback for version checking
 
@@ -111,35 +134,40 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - `install.sh` detects the ARCH and installs in the appropriated path
 - `-timeout` flag added
 
-
 ## [0.2.9] - 2026-05-06
+
 ### Added
 
 - `generator/model_exist` - checks if the model exists locally
 - `generator/check_ollama_running` - checks ollama running
 
 ### Fixed
+
 - `workflow/release.yaml` - added `requests` dependencies
 
-
 ---
+
 ## [0.2.6] - 2026-05-06
 
 ### Added
+
 - `komit update` command - update for everytype of installations
 - `komit uninstall` command - uninstall komit for everytype of installations
 - `scripts/install.sh` - check where to install komit `usr/local/bin`->Linux or `/opt/homebrew/bin`->macOS or for all `~/.local/bin`
 - `komit init` command - interactive setup wizard to create config file
 
 ### Changed
+
 - `komit-update`/`komit-update-binary`/`komit-uninstall` commands no longer needed
 
 ---
+
 ## [0.2.5] - 2026-05-05
 
 ### Added
+
 - `komit-update` command — update via pip for pip users
-- `komit-update-binary` command — update via curl for binary users  
+- `komit-update-binary` command — update via curl for binary users
 - `komit-uninstall` command — remove komit, config, and git alias in one command
 - Automatic update check on startup via `check_for_updates()`
 - `update_utils.py` — dedicated module for update/uninstall logic
@@ -153,6 +181,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Tests reorganized into `tests/cli/` and `tests/unit/`
 
 ### Fixed
+
 - Merged `build.yaml` into `release.yaml` — artifacts now transfer correctly
 - Fixed Windows binary artifact path (`.exe` suffix handling)
 - Added `ollama`, `httpx`, `platformdirs` to PyInstaller dependencies
@@ -161,6 +190,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Tests now isolated from real config file via `isolate_config` fixture
 
 ### Changed
+
 - `KomitConfig` now supports merging from CLI args and config file
 - Test suite reorganized into `tests/cli/` and `tests/unit/` subdirectories
 
@@ -169,33 +199,40 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [0.2.4] - 2026-05-04
 
 ### Fixed
+
 - Removed stale `update` import from `main.py` causing ImportError on startup
 
-
 ---
+
 ## [0.2.2] - 2026-05-05
 
 ### Added
+
 - `ROADMAP.md` — full development roadmap with phases and status
 - `CONTRIBUTING.md` — contribution guide with setup, structure, and PR process
 - `update_utils.py` — extracted update logic into its own module
 
 ### Changed
+
 - Version bumped to `0.2.2`
 
 ### Refactored
+
 - Moved update logic from `main.py` to `update_utils.py`
 - `main.py` is now cleaner with no update logic mixed in
+
 ---
 
 ## [0.2.0] - 2026-05-03
 
 ### Added
+
 - Version check on startup — notifies when a new version is available
 - `komit update` command to update komit from the CLI
 - Binary releases for Linux x86_64, macOS Apple Silicon, and Windows x86_64
 
 ### Fixed
+
 - Install script now uses GitHub API instead of HTML page for reliable tag extraction
 - Install script tag extraction uses portable `grep + sed` instead of `grep -oP` (macOS compatibility)
 - Removed stray `)` inside interactive prompt string
@@ -207,6 +244,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [0.1.3] - 2026-05-03
 
 ### Added
+
 - CLI flags: `--style` / `-s`, `--model` / `-m`, `--ollama-url` / `-u`, `--max-diff`
 - Default style, model, URL and max diff can now be set via flags
 
@@ -215,6 +253,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [0.1.2] - 2026-05-03
 
 ### Fixed
+
 - Install script `exho` typo corrected to `echo`
 - Install script "get alias" corrected to "git alias"
 - Removed `komit-macos-x86_64` binary (macos-13 runner unavailable on free tier)
@@ -228,6 +267,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [0.1.1] - 2026-05-03
 
 ### Fixed
+
 - Corrected branch name in install script URL (`main` → `master`)
 - Fixed broken `grep` regex for extracting latest release tag
 - Fixed `requires-python` from `3.14` (nonexistent) to `3.13`
@@ -244,6 +284,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [0.1.0] - 2026-05-03
 
 ### Added
+
 - AI-powered commit message generation using Ollama
 - Three commit styles: `conventional`, `simple`, `detailed`
 - Interactive prompt with `y` / `n` / `e` / `r` options
@@ -253,7 +294,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Shell script wrapper (`scripts/commit.sh`)
 - Published to PyPI
 
-[Unreleased]: https://github.com/glemiu6/komit/compare/v0.4.2...HEAD
+[Unreleased]: https://github.com/glemiu6/komit/compare/v1.0.1...HEAD
 [1.0.0]: https://github.com/glemiu6/komit/compare/v0.5.1...v1.0.0
 [0.5.1]: https://github.com/glemiu6/komit/compare/v0.4.4...v0.5.1
 [0.4.4]: https://github.com/glemiu6/komit/compare/v0.4.3...v0.4.4
