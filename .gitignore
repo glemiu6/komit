@@ -12,3 +12,5 @@ CLAUDE.md
 htmlcov/
 coverage.xml
 .pytest_cache/
+result
+result-*
