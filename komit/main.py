@@ -110,6 +110,20 @@ def parse_args(argv=None):
         default=None,
         help="Omit the branch name from commit messages.",
     )
+    config_group.add_argument(
+        "--provider",
+        choices=["ollama", "openai_compatible"],
+        default=None,
+        help="LLM provider (default: ollama).",
+    )
+
+    config_group.add_argument(
+        "--base-url",
+        dest="base_url",
+        default=None,
+        metavar="<url>",
+        help="OpenAI-compatible API URL (default: http://localhost:8080/v1).",
+    )
 
     execution_group = parser.add_argument_group("Execution Options")
 

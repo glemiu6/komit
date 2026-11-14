@@ -1,6 +1,6 @@
-# komit/generator.py
+"""Generate Git commit messages and explanations using configured LLM providers."""
+
 import httpx
-import requests
 
 from komit.git_utils import (
     allocate_diff,
@@ -11,208 +11,227 @@ from komit.git_utils import (
 )
 from komit.komitconfig import KomitConfig
 from komit.message_validation import validate_commit_message
+from komit.providers.base import LLMProvider
+from komit.providers.factory import create_provider
+from komit.providers.ollama import OllamaProvider
 
 STYLES = {
     "conventional": (
-        "Generate a conventional commit message (type: description).\n"
-        "Types: feat, fix, docs, style, refactor, test, chore.\n"
+        "Generate a Conventional Commit message (type: description).\n"
+        "Types: feat, fix, docs, style, refactor, test, chore, perf, ci, build.\n"
         "Format with branch: 'type: description [branch-name]'\n"
         "Example: 'feat: add user authentication [feature/login]'\n"
-        "Just the commit message as plain text, no markdown, no backticks, no code blocks."
+        "Return only the commit message as plain text."
     ),
     "simple": (
-        "Generate a short, clear commit message in imperative mood.\n"
+        "Generate a short, clear, single-line commit message in the imperative mood.\n"
         "Format with branch: 'Description [branch-name]'\n"
         "Example: 'Add user authentication [feature/login]'\n"
-        "Just the commit message as plain text, no markdown, no backticks, no code blocks."
+        "Return only the commit message as plain text."
     ),
     "detailed": (
-        "Generate a commit message with a short title and bullet points.\n"
-        "Format with branch: Append the branch name inside brackets to the title line.\n"
+        "Generate a commit message with a short title and supporting bullet points.\n"
+        "Append the branch name in brackets to the title line, if provided.\n"
         "Example:\n"
         "feat: add user authentication [feature/login]\n\n"
         "- Add login endpoint\n"
         "- Add JWT token generation\n"
-        "Just the commit message as plain text, no markdown, no backticks, no code blocks."
+        "Return only the commit message as plain text."
     ),
 }
 
 SYSTEM_PROMPT_TEMPLATE = """\
-You are an expert developer tool that generates Conventional Commit messages based on git diffs.
+You are a developer tool that creates accurate Git commit messages from staged diffs.
 
-CRITICAL INSTRUCTIONS:
-1. Follow this specific formatting style EXACTLY:
+1. Follow this style exactly:
 {style_rules}
 
-2. BRANCH HANDLING RULE: 
+2. Branch handling:
 {branch_context}
 
-3. FOCUS RULE:
-- Prioritize code changes (*.py, *.js, *.ts) over documentation changes (*.md, *.txt).
-- If both code and docs are changed, the commit type and description must reflect the code changes.
-- Ignore CHANGELOG.md and ROADMAP.md entirely when determining the commit type and message.
+3. Focus:
+- Describe what actually changed; do not invent features or fixes.
+- Prioritize code changes over documentation when both are present.
+- Ignore CHANGELOG.md and ROADMAP.md when deciding the commit type.
 
-4. OUTPUT RULES:
-- Output ONLY the raw commit message text — nothing else.
-- NO analysis, NO explanations, NO tables, NO markdown headers, NO "Key Changes" sections.
-- NO reasoning about what the user should do next.
-- The entire response must be a valid git commit message and nothing else.
-- Do NOT include empty brackets "[]" or empty parentheses "()".
-- NO markdown formatting, NO backticks, NO code blocks.
+4. Output:
+- Output only the raw commit message.
+- Do not include explanations, Markdown fences, or other commentary.
+- Do not add empty brackets or parentheses.
 """
 
+EXPLAIN_SYSTEM_PROMPT = (
+    "You are a code reviewer. Explain what the Git diff changes in plain English. "
+    "Use a concise numbered list, grouping related changes when appropriate. "
+    "Focus on what changed and why it matters. Avoid Markdown formatting."
+)
 
-def model_exist(url: str, model: str) -> bool:
+SUMMARIZE_SYSTEM_PROMPT = (
+    "You are a senior software developer. Summarize this file's Git diff "
+    "in one short English sentence. Focus on what changed. "
+    "Return plain text only, without Markdown."
+)
+
+
+def _create_checked_provider(config: KomitConfig) -> LLMProvider:
+    """Create the provider and perform checks specific to Ollama."""
+    provider = create_provider(config)
+
+    # Only Ollama requires these Ollama-specific availability checks.
+    if isinstance(provider, OllamaProvider):
+        if not provider.check_ollama_running(config.ollama_url):
+            raise RuntimeError("Ollama is not running. Start it with `ollama serve` and try again.")
+        if not provider.model_exist(config.ollama_url):
+            raise RuntimeError(
+                f"Model `{config.model}` is not installed. Run `ollama pull {config.model}`."
+            )
+
+    return provider
+
+
+def _generate_text(
+    provider: LLMProvider,
+    system_prompt: str,
+    user_prompt: str,
+    timeout: int,
+) -> str:
+    """Make one model request and normalize the returned text."""
     try:
-        r = requests.get(f"{url}/api/tags", timeout=5)
-        models = [m["name"] for m in r.json().get("models", [])]
-        return model in models
-    except Exception:  # noqa: E722
-        return False
+        response = provider.generate(
+            system_prompt=system_prompt,
+            user_prompt=user_prompt,
+        )
+    except httpx.TimeoutException as exc:
+        raise RuntimeError(
+            f"Generation timed out after {timeout}s. Try a longer timeout or a smaller model."
+        ) from exc
+
+    if not isinstance(response, str):
+        raise ValueError("The LLM provider returned a non-text response.")
+    return response.strip()
 
 
-def check_ollama_running(url: str) -> bool:
-    try:
-        r = requests.get(f"{url}/api/tags", timeout=5)
-        return r.status_code == 200
-    except requests.exceptions.RequestException:
-        return False
+def _branch_context(branch_info: str) -> str:
+    """Build branch instructions without inventing a branch name."""
+    active_branch = branch_info.strip()
+    if not active_branch or active_branch.lower() == "unreleased":
+        return (
+            "No branch name is available. Do not append brackets, "
+            "placeholders, or guessed branch names."
+        )
+
+    parsed_branch = parse_branch_name(active_branch)
+    context = f"CURRENT GIT BRANCH: {active_branch}\n"
+    if parsed_branch["type"]:
+        context += f"INFERRED COMMIT TYPE: {parsed_branch['type']}\n"
+    if parsed_branch["scope"]:
+        context += f"INFERRED SCOPE: {parsed_branch['scope']}\n"
+    context += (
+        f"Append exactly '[{active_branch}]' to the end of the title line. "
+        "Do not append it to any body lines."
+    )
+    return context
+
+
+def _summarize_file_with_provider(
+    filename: str,
+    chunk: str,
+    provider: LLMProvider,
+    timeout: int,
+) -> str:
+    summary = _generate_text(
+        provider,
+        SUMMARIZE_SYSTEM_PROMPT,
+        f"File: {filename}\n\n{chunk}",
+        timeout,
+    )
+    if not summary:
+        raise ValueError(f"The model returned an empty summary for {filename}.")
+    return f"{filename}: {summary}"
 
 
 def generate_message(
-    diff: str, config: KomitConfig | None = None, branch_info: str = "", deep: bool = False
-) -> tuple[str, list[str] | None]:  # noqa: E501
+    diff: str,
+    config: KomitConfig | None = None,
+    branch_info: str = "",
+    deep: bool = False,
+) -> tuple[str, list[str] | None]:
+    """Generate and validate a message for the current staged changes."""
     config = config or KomitConfig()
 
     changed_files = get_changed_files()
     files_context = f"Modified Files:\n{changed_files}\n\n" if changed_files else ""
-
     recent = get_recent_commits(3)
-    truncated_files = None
     recent_context = f"Recent Commits:\n{recent}\n\n" if recent else ""
-    if deep:
-        file_chunk = split_diff_by_file(diff)
-        summaries = [summarize_file_chunk(f, c, config) for f, c in file_chunk.items()]
-        diff = "File summaries:\n" + "\n".join(summaries)
-    else:
-        diff, truncated_files = allocate_diff(diff, config.max_diff_length)
-    style_rules = STYLES.get(config.style, STYLES["conventional"])
-    active_branch = branch_info.strip() if branch_info and branch_info.strip() else ""
+    truncated_files: list[str] | None = None
 
-    if active_branch and active_branch.lower() != "unreleased":
-        parsed_branch = parse_branch_name(active_branch)
-        branch_context = f"CURRENT GIT BRANCH: {active_branch}\n"
-        if parsed_branch["type"]:
-            branch_context += f"INFERRED COMMIT TYPE: {parsed_branch['type']}\n"
-        if parsed_branch["scope"]:
-            branch_context += f"INFERRED CODESPACE SCOPE: {parsed_branch['scope']}\n"
-        branch_context += (
-            f"MANDATORY SUFFIX: Use exactly '[{active_branch}]' at the end of the title line."  # noqa: E501
-        )
-    else:
-        branch_context = (
-            "MANDATORY RULE: No branch information is available. "
-            "Do NOT append any square brackets, placeholders, empty braces '[]', or branch names to the message. "  # noqa: E501
-            "Do NOT copy bracket patterns from recent commit history. "
-            "Do NOT guess or infer a branch name. "
-            "The commit message must end with the description text only — no suffixes of any kind."
-        )
-    system_prompt = SYSTEM_PROMPT_TEMPLATE.format(
-        style_rules=style_rules, branch_context=branch_context
-    )
-    if not check_ollama_running(config.ollama_url):
-        raise Exception(
-            "Ollama is not running. Please start it using `ollama serve` and try again."
-        )
-    if not model_exist(config.ollama_url, config.model):
-        raise Exception(
-            f"Model `{config.model}` not found locally.\nRun: `ollama pull {config.model}`"
-        )
     try:
-        from ollama import ChatResponse, Client
+        # Reuse the same client for deep-mode summaries and the final request.
+        provider = _create_checked_provider(config)
 
-        client = Client(host=config.ollama_url, timeout=httpx.Timeout(config.timeout))
-        response: ChatResponse = client.chat(
-            model=config.model,
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {
-                    "role": "user",
-                    "content": f"Review this git diff and generate the commit message:\n\n{recent_context}{files_context}Git Diff:\n{diff}",  # noqa: E501
-                },
-            ],
-        )
-        con = response.message.content or ""
-        message = con.strip().strip("`").strip()
+        if deep:
+            chunks = split_diff_by_file(diff)
+            summaries = [
+                _summarize_file_with_provider(filename, chunk, provider, config.timeout)
+                for filename, chunk in chunks.items()
+            ]
+            diff = "File summaries:\n" + "\n".join(summaries)
+        else:
+            diff, truncated_files = allocate_diff(diff, config.max_diff_length)
+
         style = config.style if config.style in STYLES else "conventional"
+        system_prompt = SYSTEM_PROMPT_TEMPLATE.format(
+            style_rules=STYLES[style],
+            branch_context=_branch_context(branch_info),
+        )
+        user_prompt = (
+            "Review this staged Git diff and generate the commit message:\n\n"
+            f"{recent_context}{files_context}Git Diff:\n{diff}"
+        )
+        message = _generate_text(provider, system_prompt, user_prompt, config.timeout)
         validate_commit_message(message, style)
         return message, truncated_files
-    except httpx.TimeoutException:
-        raise RuntimeError(
-            f"Generation timed out after {config.timeout}s.\n"
-            "Try increasing the timeout or using a smaller model."
-        )
 
-    except Exception as e:
-        raise RuntimeError(f"Failed to generate commit message: {e}")
+    except RuntimeError:
+        raise
+    except Exception as exc:
+        raise RuntimeError(f"Failed to generate commit message: {exc}") from exc
 
 
 def explain_changes(diff: str, config: KomitConfig | None = None) -> str:
+    """Explain the staged diff without generating or making a commit."""
     config = config or KomitConfig()
-
     if len(diff) > config.max_diff_length:
         diff = diff[: config.max_diff_length] + "\n... (truncated)"
 
-    if not check_ollama_running(config.ollama_url):
-        raise Exception("Ollama is not running. Please start by using `ollama serve`.")
-    if not model_exist(config.ollama_url, config.model):
-        raise Exception(
-            f"Model `{config.model}` not found locally.\nRun `ollama pull {config.model}`"
-        )  # noqa: E501
-
     try:
-        from ollama import Client
-
-        client = Client(host=config.ollama_url, timeout=httpx.Timeout(config.timeout))
-        response = client.chat(
-            model=config.model,
-            messages=[
-                {
-                    "role": "system",
-                    "content": (
-                        "You are a code reviewer. Explain what the following git diff does "
-                        "in plain English only. Use a numbered list, one item per changed file or feature. "  # noqa: E501
-                        "Be concise, focus on what changed and why it matters. "
-                        "No markdown formatting, no bold text, no asterisks, no backticks, plain text only."  # noqa: E501
-                    ),
-                },
-                {"role": "user", "content": f"Explain these changes:\n\n{diff}"},
-            ],
+        provider = _create_checked_provider(config)
+        explanation = _generate_text(
+            provider,
+            EXPLAIN_SYSTEM_PROMPT,
+            f"Explain these changes:\n\n{diff}",
+            config.timeout,
         )
-        con = response.message.content or ""
-        return con.strip().strip("`").strip()
-    except httpx.TimeoutException:
-        raise RuntimeError(f"Timed out after {config.timeout}s.")
-    except Exception as e:
-        raise RuntimeError(f"Failed to explain changes: {e}")
+        if not explanation:
+            raise ValueError("The model returned an empty explanation.")
+        return explanation
+    except RuntimeError:
+        raise
+    except Exception as exc:
+        raise RuntimeError(f"Failed to explain changes: {exc}") from exc
 
 
-def summarize_file_chunk(filename: str, chunk: str, config: KomitConfig | None = None) -> str:
+def summarize_file_chunk(
+    filename: str,
+    chunk: str,
+    config: KomitConfig | None = None,
+) -> str:
+    """Summarize one file diff using the configured provider."""
     config = config or KomitConfig()
-    from ollama import Client
-
-    client = Client(host=config.ollama_url, timeout=httpx.Timeout(config.timeout))
-    response = client.chat(
-        model=config.model,
-        messages=[
-            {
-                "role": "system",
-                "content": "You are a Senior Software developer. Summarize what changed in this file diff in one short sentence in English only. "  # noqa: E501
-                "Be concise, focus on what changed and why it matters. "
-                "Plain text only, no markdown, no bold, no asterisks, no backticks.",
-            },
-            {"role": "user", "content": f"File: {filename}\n\n{chunk}"},
-        ],
-    )
-    con = response.message.content or ""
-    return f"{filename}: {con.strip()}"
+    try:
+        provider = _create_checked_provider(config)
+        return _summarize_file_with_provider(filename, chunk, provider, config.timeout)
+    except RuntimeError:
+        raise
+    except Exception as exc:
+        raise RuntimeError(f"Failed to summarize {filename}: {exc}") from exc

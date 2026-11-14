@@ -12,6 +12,8 @@ class KomitConfig:
     ollama_url: str = "http://localhost:11434"
     timeout: int = 60
     include_branch_name: bool = True
+    base_url: str = "http://localhost:8080/v1"
+    provider: str = "ollama"
 
     @classmethod
     def from_sources(cls, args):
@@ -30,5 +32,11 @@ class KomitConfig:
             timeout=pick(args.timeout, "timeout", cls.timeout),
             include_branch_name=pick(
                 args.include_branch_name, "include_branch_name", cls.include_branch_name
+            ),
+            base_url=pick(
+                getattr(args, "base_url", None), file_key="base_url", default=cls.base_url
+            ),
+            provider=pick(
+                getattr(args, "provider", None), file_key="provider", default=cls.provider
             ),
         )

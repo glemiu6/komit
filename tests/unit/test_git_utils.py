@@ -1,12 +1,13 @@
 import subprocess
+from unittest.mock import MagicMock, patch
 
 import pytest
-from unittest.mock import patch, MagicMock
+
 from komit.git_utils import (
-    get_staged_diff,
-    get_staged_files,
     commit,
     commit_with_editor,
+    get_staged_diff,
+    get_staged_files,
     is_git_repo,
 )
 
@@ -31,8 +32,12 @@ class TestGetStagedDiff:
         mock_run.return_value = _mock_run()
         get_staged_diff()
         mock_run.assert_called_once_with(
-            ['git', 'diff', '--staged'],
-            capture_output=True, text=True,encoding='utf-8',errors="replace",check=True
+            ["git", "diff", "--staged"],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            check=True,
         )
 
     @patch("komit.git_utils.subprocess.run")
@@ -67,8 +72,11 @@ class TestGetStagedFiles:
         mock_run.return_value = _mock_run()
         get_staged_files()
         mock_run.assert_called_once_with(
-            ['git', 'diff', '--staged', '--name-only'],
-            capture_output=True, text=True,encoding='utf-8',check=True
+            ["git", "diff", "--staged", "--name-only"],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            check=True,
         )
 
     @patch("komit.git_utils.subprocess.run")
@@ -84,14 +92,13 @@ class TestCommit:
         mock_run.return_value = _mock_run()
         commit("feat: add login")
         mock_run.assert_called_once_with(
-            ['git', 'commit', '-m', 'feat: add login'],
-            check=True,encoding='utf-8'
+            ["git", "commit", "-m", "feat: add login"], check=True, encoding="utf-8"
         )
 
     @patch("komit.git_utils.subprocess.run")
     def test_check_true_propagates_called_process_error(self, mock_run):
         """Fix #7: commit() must raise CalledProcessError on failure, not silently pass."""
-        mock_run.side_effect = subprocess.CalledProcessError(1, 'git commit')
+        mock_run.side_effect = subprocess.CalledProcessError(1, "git commit")
         with pytest.raises(subprocess.CalledProcessError):
             commit("feat: will fail")
 
@@ -109,14 +116,16 @@ class TestCommitWithEditor:
         mock_run.return_value = _mock_run()
         commit_with_editor("feat: add login")
         mock_run.assert_called_once_with(
-            ['git', 'commit', '-m', 'feat: add login', '-e'],
-            check=True,encoding='utf-8',text=True
+            ["git", "commit", "-m", "feat: add login", "-e"],
+            check=True,
+            encoding="utf-8",
+            text=True,
         )
 
     @patch("komit.git_utils.subprocess.run")
     def test_check_true_propagates_called_process_error(self, mock_run):
         """Fix #7: commit_with_editor() must also raise on failure."""
-        mock_run.side_effect = subprocess.CalledProcessError(1, 'git commit')
+        mock_run.side_effect = subprocess.CalledProcessError(1, "git commit")
         with pytest.raises(subprocess.CalledProcessError):
             commit_with_editor("feat: will fail")
 
@@ -137,6 +146,8 @@ class TestIsGitRepo:
         mock_run.return_value = _mock_run()
         is_git_repo()
         mock_run.assert_called_once_with(
-            ['git', 'rev-parse', '--is-inside-work-tree'],
-            capture_output=True, text=True,encoding='utf-8'
+            ["git", "rev-parse", "--is-inside-work-tree"],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
         )

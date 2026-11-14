@@ -26,19 +26,33 @@ def init_config() -> None:
     url = input("URL [http://localhost:11434]: ") or "http://localhost:11434"
     max_diff = input("Max diff length [4000]: ") or 4000
     timeout = input("Timeout [60]: ") or 60
-
+    base_url: str = input("Base URL [http://localhost:80808]: ") or "http://localhost:80808"
+    provider: str = input("Provider [openai_compatible]: ") or "openai_compatible"
     include_branch = input("Include branch name [True/False]: ").lower() or "true"
     if include_branch in ["true", "t", "y", "yes"]:
         include_branch_name = "true"
     else:
         include_branch_name = "false"
 
-    content = f"""model = "{model}"
-style = "{style}"
-ollama_url = "{url}"
-max_diff_length = {max_diff}
-timeout = {timeout}
-include_branch_name = {include_branch_name}
+    if provider == "openai_compatible":
+        content = f"""model = "{model}"
+                            style = "{style}"
+                            provider = "{provider}
+                            base_url = "{base_url}
+                            max_diff_length = {max_diff}
+                            timeout = {timeout}
+                            include_branch_name = {include_branch_name}
+
+        """
+    else:
+        content = f"""model = "{model}"
+                    style = "{style}"
+                    provider = "{provider}
+                    ollama_url = "{url}"
+                    max_diff_length = {max_diff}
+                    timeout = {timeout}
+                    include_branch_name = {include_branch_name}
+                    
 """
     with open(paths, "w") as f:
         f.write(content.strip())

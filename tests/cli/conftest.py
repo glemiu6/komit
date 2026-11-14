@@ -1,7 +1,8 @@
 # tests/cli/conftest.py
 import sys
-import pytest
 from unittest.mock import patch
+
+import pytest
 
 
 @pytest.fixture(autouse=True)
@@ -20,7 +21,6 @@ def no_update_check():
 def isolate_config(tmp_path):
     """Prevent tests from reading or writing the real config file."""
     with patch(
-        "komit.config_utils.get_default_config_path",
-        return_value=str(tmp_path / "config.toml")
+        "komit.config_utils.get_default_config_path", return_value=str(tmp_path / "config.toml")
     ):
         yield

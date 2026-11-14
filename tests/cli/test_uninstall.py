@@ -1,6 +1,6 @@
 # tests/test_uninstall.py
 import sys
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 
 def test_uninstall_windows():
@@ -14,9 +14,11 @@ def test_uninstall_windows():
                 with patch("shutil.rmtree"):
                     with patch("subprocess.run"):
                         from komit import update_utils
+
                         update_utils.uninstall()
 
     mock_winreg.SetValueEx.assert_called_once()
+
 
 def test_uninstall_linux():
     with patch("sys.platform", "linux"):
@@ -24,4 +26,5 @@ def test_uninstall_linux():
             with patch("subprocess.run"):  # prevent actual git/rm commands
                 with patch("shutil.rmtree"):  # prevent actual directory removal
                     from komit import update_utils
+
                     update_utils.uninstall()
