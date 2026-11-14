@@ -29,10 +29,11 @@
             src = ./.;
 
             pyproject = true;
-            build-system = [ python.setuptools ];
+            build-system = [ python.hatchling ];
             dependencies = with python; [
               argcomplete
               httpx
+              mypy
               ollama
               platformdirs
               requests
