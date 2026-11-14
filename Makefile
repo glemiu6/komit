@@ -8,6 +8,7 @@ test:
 	uv run ruff check komit/
 	uv run mypy komit/
 	uv run ruff format komit/
+	uv run ruff format --check komit/
 
 clean:
 	rm -rf dist/ build/ __pycache__
