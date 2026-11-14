@@ -7,6 +7,22 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added
+
+- Added provider selection through `--provider`, with Ollama and OpenAI-compatible implementations.
+- Added `--base-url` and `base_url` configuration for OpenAI-compatible APIs.
+- Added a shared `LLMProvider` protocol and provider factory for extensible model backends.
+
+### Changed
+
+- Centralized commit-message generation, explanations, and file summaries through the configured provider.
+- Ollama availability and model checks now run only when the Ollama provider is selected.
+- Expanded commit-message generation to support Conventional Commit types such as `perf`, `ci`, and `build`.
+
+### Fixed
+
+- Added consistent response validation and clearer error handling for provider failures, timeouts, empty responses, and malformed commit messages.
+
 ## 1.0.3 - 2026-11-14
 
 ### Added
@@ -306,7 +322,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Shell script wrapper (`scripts/commit.sh`)
 - Published to PyPI
 
-[Unreleased]: https://github.com/glemiu6/komit/compare/v1.0.2...HEAD
+[Unreleased]: https://github.com/glemiu6/komit/compare/v1.0.3...HEAD
+[1.0.3]: https://github.com/glemiu6/komit/compare/v1.0.2...v1.0.3
 [1.0.2]: https://github.com/glemiu6/komit/compare/v1.0.1...v1.0.2
 [1.0.0]: https://github.com/glemiu6/komit/compare/v0.5.1...v1.0.0
 [0.5.1]: https://github.com/glemiu6/komit/compare/v0.4.4...v0.5.1

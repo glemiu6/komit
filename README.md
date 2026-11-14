@@ -1,398 +1,145 @@
 # 🤖 komit
 
-AI-powered git commit message generator using local LLMs via Ollama. No API keys, no internet required — runs completely locally and privately.
+AI-assisted Git commit messages from your staged changes. Komit reads the diff, recent commit history, changed files, and—optionally—the current branch, then suggests a commit message you can review before committing.
 
----
+It runs locally by default with Ollama and also supports OpenAI-compatible providers.
 
 [![PyPI](https://img.shields.io/pypi/v/komit)](https://pypi.org/project/komit)
 [![Python](https://img.shields.io/pypi/pyversions/komit)](https://pypi.org/project/komit)
 [![License](https://img.shields.io/github/license/glemiu6/komit)](https://github.com/glemiu6/komit/blob/master/LICENSE)
 [![Downloads](https://static.pepy.tech/badge/komit/month)](https://pepy.tech/project/komit)
-[![CI](https://github.com/glemiu6/komit/actions/workflows/ci.yaml/badge.svg)](https://github.com/glemiu6/komit/actions)
-[![codecov](https://codecov.io/gh/glemiu6/komit/branch/master/graph/badge.svg)](https://codecov.io/gh/glemiu6/komit)
 
----
+## Highlights
 
-[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=flat&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/glemiu6)
+- **Provider-based LLM integration** — use Ollama or an OpenAI-compatible API through one configuration surface.
+- **Context-aware messages** — uses staged diffs, modified files, recent commits, and branch-derived type/scope hints.
+- **Three output styles** — Conventional Commits, simple one-line messages, or detailed messages with bullet points.
+- **Large-diff support** — allocates context per file and offers `--deep` mode for file-by-file summaries.
+- **Safe review workflow** — preview with `--dry-run`, explain changes with `--explain`, regenerate, edit, or cancel before committing.
+- **Validated output** — rejects malformed model responses and checks Ollama availability and local model installation before generation.
+- **Portable CLI** — install with pip, pipx, Homebrew, a binary, PowerShell, or Nix; supports Linux, macOS, and Windows.
 
----
+## Quick start
 
-## Features
-
-- 🧠 **Local LLM** — uses Ollama, no API keys needed
-- 🌿 **Branch-Aware Context** — infers conventional types and scopes directly from your active git branch
-- 📝 **Multiple commit styles** — conventional, simple, detailed
-- 🔍 **Smart diff allocation** — per-file context budget, code files prioritized over docs
-- 🔎 **Deep mode** — summarize each file separately for better messages on large changesets
-- 💡 **Explain mode** — summarize what changed without committing
-- 🕐 **Recent commits context** — last 3 commits included in the prompt for better inference
-- 🔄 **Regenerate** — not happy? generate a new message instantly
-- ✏️ **Edit before commit** — open your editor to tweak the message
-- ⚙️ **CLI flags** — control style, model, and more from the command line
-- 📁 **Config file** — persist your preferences with `komit init`
-- 🌍 **Universal** — works via pip, binary, Homebrew, or shell script
-- 🪟 **Cross-platform** — Linux, macOS, Windows
-- ⚡ **Fast** — runs on your machine, no network calls to external APIs
-- 🔒 **Ollama validation** — checks if Ollama is running and model exists before generating
-- 🔁 **Smart updates** — detects pip vs binary install and updates accordingly
-- ❄️ **Nix / NixOS support** — reproducible installations through Nix Flakes
-
----
-
-## Requirements
-
-- [Ollama](https://ollama.com) installed and running
-- A local model pulled (e.g. `ollama pull qwen2.5:7b`)
-
----
-
-## Recommended Models
-
-| Model         | Size  | Best for     |
-| ------------- | ----- | ------------ |
-| `qwen2.5:7b`  | 4.7GB | Best quality |
-| `mistral:7b`  | 4.1GB | Good balance |
-| `llama3.2:3b` | 2.0GB | Fastest      |
+Install Komit and pull a local model:
 
 ```bash
+pipx install komit
 ollama pull qwen2.5:7b
 ```
 
----
-
-## Installation
-
-### Option 1 — Homebrew (macOS/Linux, recommended)
+Stage changes and run Komit:
 
 ```bash
-brew tap glemiu6/komit
-brew install komit
+git add .
+komit
 ```
 
-Shell completion is included automatically — no extra setup needed.
-
-### Option 2 — One line install (Linux/macOS, no Python required)
+Komit shows the staged files and proposed message, then lets you accept, reject, edit, or regenerate it. Use it as a Git alias if preferred:
 
 ```bash
+git config --global alias.ai '!komit'
+git ai
+```
+
+## Providers
+
+Ollama is the default and requires a running Ollama server with the selected model installed:
+
+```bash
+komit --provider ollama --model qwen2.5:7b
+```
+
+For an OpenAI-compatible server, select the provider and set its base URL:
+
+```bash
+komit \
+  --provider openai_compatible \
+  --base-url http://localhost:8080/v1 \
+  --model your-model
+```
+
+## Useful commands
+
+```bash
+komit --dry-run       # generate without committing
+komit --explain       # explain staged changes without committing
+komit --deep          # summarize files before generating the message
+komit --style simple  # choose conventional, simple, or detailed output
+komit --model mistral:7b
+komit init            # create the user configuration file
+komit update          # update Komit
+komit uninstall       # remove Komit
+```
+
+## Configuration
+
+Run `komit init` to create `~/.config/komit/config.toml` (platform-dependent config directory). CLI options override values from the file.
+
+```toml
+model = "qwen2.5:7b"
+style = "conventional"
+provider = "ollama"
+ollama_url = "http://localhost:11434"
+base_url = "http://localhost:8080/v1"
+max_diff_length = 4000
+timeout = 60
+include_branch_name = true
+```
+
+The main configuration options are `provider`, `model`, `style`, `ollama_url`, `base_url`, `max_diff_length`, `timeout`, and `include_branch_name`.
+
+## Download and installation options
+
+### Prebuilt binaries
+
+Download the latest release from [GitHub Releases](https://github.com/glemiu6/komit/releases/latest):
+
+| Platform | Download |
+| --- | --- |
+| Linux x86_64 | `komit-linux-x86_64` |
+| macOS Apple Silicon | `komit-macos-arm64` |
+| Windows x86_64 | `komit-windows-x86_64.exe` |
+| macOS Intel | Use `pip`, Homebrew, or the installer below; no Intel binary is currently published. |
+
+On Linux and macOS, make the downloaded binary executable and place it on your `PATH`:
+
+```bash
+chmod +x komit-*
+sudo mv komit-* /usr/local/bin/komit
+```
+
+### Installers and package managers
+
+```bash
+# pip / pipx
+pip install komit
+pipx install komit
+
+# Homebrew
+brew tap glemiu6/komit && brew install komit
+
+# Linux/macOS installer
 curl -fsSL https://raw.githubusercontent.com/glemiu6/komit/master/scripts/install.sh | bash
+
+# Nix
+nix profile install github:glemiu6/komit
+nix run github:glemiu6/komit
 ```
 
-### Option 3 — Windows PowerShell
+Windows users can run the PowerShell installer:
 
 ```powershell
 irm https://raw.githubusercontent.com/glemiu6/komit/master/scripts/install.ps1 | iex
 ```
 
-### Option 4 — pip
+Nix supports Linux and macOS, including Intel and Apple Silicon systems. Nix-managed installations should be updated or removed with Nix rather than `komit update` or `komit uninstall`.
 
-```bash
-pip install komit
-```
+## Requirements
 
-### Option 5 — pipx (recommended for CLI tools)
-
-```bash
-pipx install komit
-```
-
-### Option 6 — Download binary
-
-Download the binary for your platform from [GitHub Releases](https://github.com/glemiu6/komit/releases/latest):
-
-| Platform            | Binary                     |
-| ------------------- | -------------------------- |
-| Linux x86_64        | `komit-linux-x86_64`       |
-| macOS Apple Silicon | `komit-macos-arm64`        |
-| Windows             | `komit-windows-x86_64.exe` |
-
-> Intel Mac users: use `pip install komit` instead.
-
-```bash
-# Linux/macOS
-chmod +x komit-*
-sudo mv komit-* /usr/local/bin/komit
-```
-
-### Option 7 — Nix / NixOS
-
-Komit supports reproducible installations through Nix Flakes.
-
-**Install Komit:**
-
-```bash
-nix profile install github:glemiu6/komit
-```
-
-**Run without installing:**
-
-```bash
-nix run github:glemiu6/komit
-```
-
-**Install declaratively on NixOS:**
-
-Add Komit to your `flake.nix` inputs:
-
-```nix
-komit = {
-  url = "github:glemiu6/komit";
-  inputs.nixpkgs.follows = "nixpkgs";
-};
-```
-
-Then include it in your system packages:
-
-```nix
-environment.systemPackages = [
-  inputs.komit.packages.${pkgs.stdenv.hostPlatform.system}.default
-];
-```
-
-The NixOS module must have access to `inputs`, for example through `specialArgs`.
-
-**Update Komit:**
-
-For a standalone Nix profile installation:
-
-```bash
-nix profile upgrade komit
-```
-
-For a NixOS flake installation:
-
-```bash
-nix flake update komit
-sudo nixos-rebuild switch --flake .#desktop
-```
-
-Replace `desktop` with your NixOS configuration name.
-
-**Requirements:** Komit requires access to a running Ollama server and an available model. The Nix package provides the CLI and its Python dependencies, but does not automatically install or configure the Ollama service.
-
-> **Note:** Nix-managed installations should be updated or removed using Nix, not the built-in `komit update` or `komit uninstall` commands.
-
----
-
-## Setup
-
-### Git alias (recommended)
-
-```bash
-git config --global alias.ai '!komit'
-```
-
-Now you can use `git ai` as a shortcut.
-
-### Shell completion
-
-If installed via **Homebrew**, completion works automatically.
-
-For other install methods, activate it once:
-
-```bash
-# bash
-echo 'eval "$(register-python-argcomplete komit)"' >> ~/.bashrc
-source ~/.bashrc
-
-# zsh
-echo 'eval "$(register-python-argcomplete komit)"' >> ~/.zshrc
-source ~/.zshrc
-
-# fish
-register-python-argcomplete --shell fish komit | source
-```
-
----
-
-## Usage
-
-```bash
-# stage your changes
-git add .
-
-# generate commit message
-komit
-
-# or via git alias
-git ai
-```
-
-### Subcommands & Maintenance
-
-```bash
-komit init       # create or overwrite your config file
-komit update     # update to the latest version
-komit uninstall  # remove komit from your system
-```
-
-### CLI flags
-
-| Flag                    | Short | Type                                 | Default | Description                                                    |
-| ----------------------- | ----- | ------------------------------------ | ------- | -------------------------------------------------------------- |
-| `--style`               | `-s`  | `conventional`, `simple`, `detailed` | config  | Commit message format                                          |
-| `--model`               | `-m`  | String                               | config  | Ollama model to use                                            |
-| `--ollama-url`          | `-u`  | URL                                  | config  | Ollama API endpoint                                            |
-| `--max_diff`            | —     | Integer                              | config  | Max diff length in characters                                  |
-| `--timeout`             | —     | Integer                              | config  | LLM request timeout in seconds                                 |
-| `--include_branch_name` | `-ib` | Bool                                 | config  | Append branch name to commit message                           |
-| `--dry-run`             | `-dr` | Flag                                 | `False` | Preview message without committing                             |
-| `--explain`             | —     | Flag                                 | `False` | Explain staged changes without committing                      |
-| `--deep`                | —     | Flag                                 | `False` | Summarize each file separately (slower, better on large diffs) |
-| `--config`              | —     | Path                                 | —       | Path to a custom config file                                   |
-
-### Examples
-
-```bash
-# simple style
-komit --style simple
-
-# use a faster model
-komit --model llama3.2:3b
-
-# preview without committing
-komit --dry-run
-
-# explain what changed without committing
-komit --explain
-
-# better messages on large diffs (slower)
-komit --deep
-
-# include branch name in the message
-komit --include_branch_name True
-
-# remote Ollama instance
-komit --ollama-url http://192.168.1.10:11434
-```
-
----
-
-## Interactive Experience
-
-```text
-╭──────────────────────── Staged files (3) ────────────────────────╮
-│  • src/auth.py                                                    │
-│  • tests/test_auth.py                                             │
-│  • README.md                                                      │
-╰───────────────────────────────────────────────────────────────────╯
-Branch name: feat/auth-tokens
-Model: qwen2.5:7b · Style: conventional
-
-⠋ Generating commit message...
-
-╭──────────────────── Suggested commit message ─────────────────────╮
-│ feat: add JWT authentication token engine [feat/auth-tokens]      │
-╰───────────────────────────────────────────────────────────────────╯
-
-» Choose an action: (y)es, (n)o, (e)dit, (r)egenerate (y):
-```
-
-| Option     | Key | Behavior                               |
-| ---------- | --- | -------------------------------------- |
-| Yes        | `y` | Commit with the generated message      |
-| No         | `n` | Cancel without committing              |
-| Edit       | `e` | Open your editor to modify the message |
-| Regenerate | `r` | Generate a new message                 |
-
----
-
-## Deep Mode
-
-For large changesets with many files, `--deep` summarizes each file individually before generating the final commit message. More accurate, but slower since it makes one LLM call per file.
-
-```bash
-komit --deep
-```
-
----
-
-## Explain Mode
-
-Explains your staged changes in plain English without committing — useful for code review prep or PR descriptions.
-
-```bash
-komit --explain
-```
-
----
-
-## Branch Name Parsing
-
-When `--include_branch_name` is enabled, komit reads your branch name to infer the commit type and scope automatically.
-
-| Branch               | Inferred type | Inferred scope |
-| -------------------- | ------------- | -------------- |
-| `feat/auth-login`    | `feat`        | `auth`         |
-| `fix/ui_button`      | `fix`         | `ui_button`    |
-| `refactor/api-layer` | `refactor`    | `api`          |
-
-Supported types: `feat`, `fix`, `chore`, `docs`, `style`, `refactor`, `test`, `ci`, `perf`.
-
----
-
-## Configuration
-
-Run `komit init` to create your config file at `~/.config/komit/config.toml`:
-
-```toml
-model = "qwen2.5:7b"
-style = "conventional"
-ollama_url = "http://localhost:11434"
-max_diff_length = 4000
-timeout = 60
-include_branch_name = false
-```
-
-CLI flags always override config file values.
-
----
-
-## Commit Style Outputs
-
-### Conventional (default)
-
-```
-feat: add user authentication
-fix: resolve null pointer in response pipeline
-```
-
-### Simple
-
-```
-Add user authentication
-Fix null pointer in response pipeline
-```
-
-### Detailed
-
-```
-feat: add user authentication
-
-- Add JWT token generation pipeline
-- Implement password hashing with bcrypt
-- Add login and logout endpoints
-```
-
----
-
-## Maintenance
-
-```bash
-komit update     # update to latest version
-komit uninstall  # remove komit completely
-```
-
----
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feat/my-cool-feature`)
-3. Commit your changes (`komit` 😉)
-4. Push to the branch (`git push origin feat/my-cool-feature`)
-5. Open a Pull Request
-
----
+- Python 3.13+ for Python installations
+- A configured LLM provider
+- For Ollama: [Ollama](https://ollama.com) running locally or at the configured URL, with a model pulled
 
 ## License
 
