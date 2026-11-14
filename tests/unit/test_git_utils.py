@@ -1,5 +1,4 @@
 import subprocess
-from idlelib.iomenu import encoding
 
 import pytest
 from unittest.mock import patch, MagicMock
@@ -33,7 +32,7 @@ class TestGetStagedDiff:
         get_staged_diff()
         mock_run.assert_called_once_with(
             ['git', 'diff', '--staged'],
-            capture_output=True, text=True,encoding='utf-8',errors="replace"
+            capture_output=True, text=True,encoding='utf-8',errors="replace",check=True
         )
 
     @patch("komit.git_utils.subprocess.run")
@@ -69,7 +68,7 @@ class TestGetStagedFiles:
         get_staged_files()
         mock_run.assert_called_once_with(
             ['git', 'diff', '--staged', '--name-only'],
-            capture_output=True, text=True,encoding='utf-8'
+            capture_output=True, text=True,encoding='utf-8',check=True
         )
 
     @patch("komit.git_utils.subprocess.run")

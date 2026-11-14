@@ -24,6 +24,15 @@ from komit.komitconfig import KomitConfig
 from komit.update_utils import check_for_updates, uninstall, update
 
 
+def _parse_bool(value: str) -> bool:
+    normalized = value.lower()
+    if normalized in {"true", "1", "yes", "y", "on"}:
+        return True
+    if normalized in {"false", "0", "no", "n", "off"}:
+        return False
+    raise argparse.ArgumentTypeError("Expected true or false.")
+
+
 def parse_args(argv=None):
     parser = argparse.ArgumentParser(
         prog="komit",
@@ -87,11 +96,19 @@ def parse_args(argv=None):
     # flag for branch detection
     config_group.add_argument(
         "--include_branch_name",
+        "--include-branch-name",
         "-ib",
-        type=bool,
+        type=_parse_bool,
         default=None,
         metavar="<bool>",
-        help="Include branch name in commit message (default: True)",
+        help="Include branch name in commit message (true/false).",
+    )
+    config_group.add_argument(
+        "--no-include-branch-name",
+        dest="include_branch_name",
+        action="store_false",
+        default=None,
+        help="Omit the branch name from commit messages.",
     )
 
     execution_group = parser.add_argument_group("Execution Options")
@@ -146,15 +163,27 @@ def run():
     if not is_git_repo():
         console.print("Not a git repository", style="yellow")
         sys.exit(1)
-    diff = get_staged_diff()
+    try:
+        diff = get_staged_diff()
+    except (subprocess.CalledProcessError, OSError) as exc:
+        console.print(f"Could not read staged changes: {exc}", style="bold red")
+        sys.exit(1)
     if not diff:
         console.print("No staged changes. Run 'git add' first.", style="yellow")
         sys.exit(1)
-    files = get_staged_files()
+    try:
+        files = get_staged_files()
+    except (subprocess.CalledProcessError, OSError) as exc:
+        console.print(f"Could not list staged files: {exc}", style="bold red")
+        sys.exit(1)
     files_text = "\n".join(f" [cyan]•[/cyan] {f}" for f in files)
     console.print(Panel(files_text, title=f"Staged files ({len(files)})", border_style="blue"))
     config = KomitConfig.from_sources(args)
-    branch_name = get_current_branch() if config.include_branch_name else ""
+    try:
+        branch_name = get_current_branch() if config.include_branch_name else ""
+    except (subprocess.CalledProcessError, OSError) as exc:
+        console.print(f"Could not read the current branch: {exc}", style="bold red")
+        sys.exit(1)
     console.print(f"Branch name: [blue]{branch_name}[/blue]", style="dim")
     console.print(
         f"Model: [cyan]{config.model}[/cyan] · Style: [cyan]{config.style}[/cyan]", style="dim"
@@ -204,6 +233,19 @@ def run():
             show_choices=False,
             default="y",
         )
+        if choice in ("y", "e"):
+            try:
+                current_diff = get_staged_diff()
+            except (subprocess.CalledProcessError, OSError) as exc:
+                console.print(f"Could not recheck staged changes: {exc}", style="bold red")
+                sys.exit(1)
+            if current_diff != diff:
+                console.print(
+                    "Staged changes have changed since generation. "
+                    "Run Komit again to review the current diff.",
+                    style="bold red",
+                )
+                sys.exit(1)
         match choice:
             case "y":
                 try:

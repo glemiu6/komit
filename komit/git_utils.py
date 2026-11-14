@@ -10,13 +10,14 @@ def get_staged_diff() -> str:
         text=True,
         encoding="utf-8",
         errors="replace",
+        check=True,
     )
     return result.stdout
 
 
 def get_staged_files() -> list[str]:
     result = subprocess.run(
-        ["git", "diff", "--staged", "--name-only"], capture_output=True, text=True, encoding="utf-8"
+        ["git", "diff", "--staged", "--name-only"], capture_output=True, text=True, encoding="utf-8",check=True,
     )
     return [f for f in result.stdout.strip().split("\n") if f]
 

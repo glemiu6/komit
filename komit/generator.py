@@ -10,6 +10,7 @@ from komit.git_utils import (
     split_diff_by_file,
 )
 from komit.komitconfig import KomitConfig
+from komit.message_validation import validate_commit_message
 
 STYLES = {
     "conventional": (
@@ -142,7 +143,10 @@ def generate_message(
             ],
         )
         con = response.message.content or ""
-        return con.strip().strip("`").strip(), truncated_files
+        message = con.strip().strip("`").strip()
+        style = config.style if config.style in STYLES else "conventional"
+        validate_commit_message(message, style)
+        return message, truncated_files
     except httpx.TimeoutException:
         raise RuntimeError(
             f"Generation timed out after {config.timeout}s.\n"
