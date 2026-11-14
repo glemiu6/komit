@@ -18,6 +18,7 @@ def test_staged_diff_change_prevents_commit(capsys):
         patch("komit.main.get_current_branch", return_value="feature/test"),
         patch("komit.main.KomitConfig.from_sources", return_value=KomitConfig()),
         patch("komit.main.generate_message", return_value=("feat: change", [])),
+        patch("komit.main.Prompt.ask", return_value="y"),
         patch("komit.main.commit") as commit,
     ):
         with pytest.raises(SystemExit) as exc:
