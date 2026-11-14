@@ -1,5 +1,6 @@
 import httpx
 
+
 class OpenAICompatibleProvider:
     def __init__(self,model:str,base_url:str,timeout:int=60,api_key:str|None=None):
         self.model = model

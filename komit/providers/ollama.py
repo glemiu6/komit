@@ -1,5 +1,6 @@
 from ollama import Client
 
+
 class OllamaProvider:
 
     def __init__(self,model:str,base_url:str,timeout:int):
