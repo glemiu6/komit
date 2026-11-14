@@ -27,6 +27,5 @@ def validate_commit_message(message: str, style: str = "conventional") -> None:
         raise ValueError("Commit message subject cannot be empty.")
     if style == "conventional" and not _CONVENTIONAL_TITLE.fullmatch(lines[0]):
         raise ValueError(
-            "Expected a Conventional Commit subject such as "
-            "'feat: add configuration validation'."
+            "Expected a Conventional Commit subject such as 'feat: add configuration validation'."
         )
