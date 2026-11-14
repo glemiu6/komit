@@ -9,6 +9,16 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- Introduced an `LLMProvider` protocol and initial Ollama and OpenAI-compatible provider implementations.
+
+### Changed
+
+- Added Hatchling build-system configuration for package builds.
+
+## [1.0.2] - 2026-11-14
+
+### Added
+
 - Native Nix Flake support for declarative and reproducible installations.
 - Nix package definition using `buildPythonApplication`.
 - Installation support through `nix profile install` and NixOS configurations.
@@ -294,7 +304,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Shell script wrapper (`scripts/commit.sh`)
 - Published to PyPI
 
-[Unreleased]: https://github.com/glemiu6/komit/compare/v1.0.1...HEAD
+[Unreleased]: https://github.com/glemiu6/komit/compare/v1.0.2...HEAD
+[1.0.2]: https://github.com/glemiu6/komit/compare/v1.0.1...v1.0.2
 [1.0.0]: https://github.com/glemiu6/komit/compare/v0.5.1...v1.0.0
 [0.5.1]: https://github.com/glemiu6/komit/compare/v0.4.4...v0.5.1
 [0.4.4]: https://github.com/glemiu6/komit/compare/v0.4.3...v0.4.4
