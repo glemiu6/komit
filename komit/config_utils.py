@@ -14,7 +14,6 @@ def get_default_config_path() -> str:
     return os.path.join(config_dir, "config.toml")
 
 
-
 def init_config() -> None:
     path = get_default_config_path()
 
@@ -23,10 +22,7 @@ def init_config() -> None:
         if choice != "y":
             return
 
-    provider = (
-        input("Provider [ollama/openai_compatible]: ").strip().lower()
-        or "ollama"
-    )
+    provider = input("Provider [ollama/openai_compatible]: ").strip().lower() or "ollama"
 
     if provider not in ("ollama", "openai_compatible"):
         print(f"Unsupported provider: {provider}")
@@ -48,26 +44,17 @@ def init_config() -> None:
         print("Max diff length and timeout must be positive integers.")
         return
 
-    include_branch = (
-        input("Include branch name [true/false]: ").strip().lower()
-        or "true"
-    )
+    include_branch = input("Include branch name [true/false]: ").strip().lower() or "true"
 
     if include_branch not in ("true", "false"):
         print("Include branch name must be true or false.")
         return
 
     if provider == "ollama":
-        url = (
-            input("Ollama URL [http://localhost:11434]: ").strip()
-            or "http://localhost:11434"
-        )
+        url = input("Ollama URL [http://localhost:11434]: ").strip() or "http://localhost:11434"
         provider_config = f'ollama_url = "{url}"'
     else:
-        url = (
-            input("Base URL [http://localhost:8080]: ").strip()
-            or "http://localhost:8080"
-        )
+        url = input("Base URL [http://localhost:8080]: ").strip() or "http://localhost:8080"
         provider_config = f'base_url = "{url}"'
 
     content = f"""model = "{model}"
@@ -85,7 +72,6 @@ include_branch_name = {include_branch}
     print(f"Config file created at {path}")
 
 
-
 def load_config_file(file_path=None) -> dict:
     config_file = file_path or get_default_config_path()
 
@@ -95,5 +81,4 @@ def load_config_file(file_path=None) -> dict:
         with open(config_file, "rb") as f:
             return tomllib.load(f)
     except tomllib.TOMLDecodeError as exc:
-        raise ValueError(
-                f"Invalid TOML configuration in {config_file}: {exc}") from exc
+        raise ValueError(f"Invalid TOML configuration in {config_file}: {exc}") from exc
